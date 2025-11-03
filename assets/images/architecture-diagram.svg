@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .box { fill: #f0f8ff; stroke: #4682b4; stroke-width: 2; rx: 5; }
+      .azure-box { fill: #e6f3ff; stroke: #0078d4; stroke-width: 2; rx: 5; }
+      .hsm-box { fill: #fff2e6; stroke: #ff8c00; stroke-width: 2; rx: 5; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+      .title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; text-anchor: middle; }
+      .arrow { stroke: #333; stroke-width: 2; marker-end: url(#arrowhead); }
+      .secure-arrow { stroke: #008000; stroke-width: 3; stroke-dasharray: 5,5; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect x="0" y="0" width="800" height="600" fill="#fafafa"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" class="title" font-size="20">Application Gateway - Managed HSM Keyless TLS Architecture</text>
+  
+  <!-- Client -->
+  <rect x="50" y="100" width="120" height="80" class="box"/>
+  <text x="110" y="130" class="title">Client</text>
+  <text x="110" y="150" class="text">Web Browser</text>
+  <text x="110" y="165" class="text">Mobile App</text>
+  
+  <!-- Internet Cloud -->
+  <ellipse cx="300" cy="140" rx="80" ry="40" fill="#e0e0e0" stroke="#666" stroke-width="1"/>
+  <text x="300" y="145" class="text">Internet</text>
+  
+  <!-- Application Gateway -->
+  <rect x="450" y="80" width="280" height="120" class="azure-box"/>
+  <text x="590" y="105" class="title">Azure Application Gateway</text>
+  
+  <!-- TLS Termination -->
+  <rect x="470" y="120" width="100" height="40" class="box"/>
+  <text x="520" y="135" class="text">TLS</text>
+  <text x="520" y="150" class="text">Termination</text>
+  
+  <!-- TLS Offload Library -->
+  <rect x="590" y="120" width="120" height="40" class="box"/>
+  <text x="650" y="135" class="text">TLS Offload</text>
+  <text x="650" y="150" class="text">Library (PKCS#11)</text>
+  
+  <!-- Managed HSM -->
+  <rect x="500" y="280" width="200" height="120" class="hsm-box"/>
+  <text x="600" y="305" class="title">Azure Managed HSM</text>
+  
+  <!-- Private Keys -->
+  <rect x="520" y="320" width="70" height="40" class="hsm-box"/>
+  <text x="555" y="335" class="text">Private</text>
+  <text x="555" y="350" class="text">Keys</text>
+  
+  <!-- Crypto Operations -->
+  <rect x="610" y="320" width="70" height="40" class="hsm-box"/>
+  <text x="645" y="335" class="text">Crypto</text>
+  <text x="645" y="350" class="text">Operations</text>
+  
+  <!-- Backend Servers -->
+  <rect x="500" y="460" width="200" height="80" class="azure-box"/>
+  <text x="600" y="485" class="title">Backend Servers</text>
+  <text x="600" y="505" class="text">Web Applications</text>
+  <text x="600" y="520" class="text">API Services</text>
+  
+  <!-- Service Principal Box -->
+  <rect x="50" y="280" width="150" height="100" class="box"/>
+  <text x="125" y="305" class="title">Service Principal</text>
+  <text x="125" y="325" class="text">Authentication</text>
+  <text x="125" y="345" class="text">• Client ID</text>
+  <text x="125" y="360" class="text">• Client Secret</text>
+  
+  <!-- Key Vault (Optional) -->
+  <rect x="250" y="280" width="120" height="80" class="azure-box"/>
+  <text x="310" y="305" class="title">Key Vault</text>
+  <text x="310" y="325" class="text">(Optional)</text>
+  <text x="310" y="345" class="text">Certificates</text>
+  
+  <!-- Arrows and Data Flow -->
+  
+  <!-- Client to Internet -->
+  <line x1="170" y1="140" x2="220" y2="140" class="arrow"/>
+  <text x="195" y="135" class="text" font-size="12">HTTPS</text>
+  
+  <!-- Internet to App Gateway -->
+  <line x1="380" y1="140" x2="450" y2="140" class="arrow"/>
+  
+  <!-- TLS Termination to TLS Offload -->
+  <line x1="570" y1="140" x2="590" y2="140" class="arrow"/>
+  
+  <!-- App Gateway to Managed HSM (Secure) -->
+  <line x1="650" y1="160" x2="600" y2="280" class="secure-arrow"/>
+  <text x="625" y="220" class="text" font-size="12" fill="#008000">Crypto API</text>
+  <text x="625" y="235" class="text" font-size="12" fill="#008000">(Secure)</text>
+  
+  <!-- Service Principal to Managed HSM -->
+  <line x1="200" y1="330" x2="500" y2="340" class="secure-arrow"/>
+  <text x="350" y="335" class="text" font-size="12" fill="#008000">Authentication</text>
+  
+  <!-- App Gateway to Backend -->
+  <line x1="590" y1="200" x2="590" y2="460" class="arrow"/>
+  <text x="610" y="330" class="text" font-size="12">Encrypted</text>
+  <text x="610" y="345" class="text" font-size="12">Traffic</text>
+  
+  <!-- Key Vault to Managed HSM (Optional) -->
+  <line x1="370" y1="320" x2="500" y2="340" class="arrow" stroke-dasharray="3,3"/>
+  <text x="435" y="315" class="text" font-size="12">Certificate</text>
+  <text x="435" y="330" class="text" font-size="12">Sync (Optional)</text>
+  
+  <!-- Security Benefits Box -->
+  <rect x="50" y="460" width="200" height="120" class="box" fill="#f0fff0"/>
+  <text x="150" y="485" class="title">Security Benefits</text>
+  <text x="150" y="505" class="text" font-size="12">• Keys never leave HSM</text>
+  <text x="150" y="520" class="text" font-size="12">• FIPS 140-2 Level 3</text>
+  <text x="150" y="535" class="text" font-size="12">• Hardware-backed security</text>
+  <text x="150" y="550" class="text" font-size="12">• Audit trails</text>
+  <text x="150" y="565" class="text" font-size="12">• Compliance ready</text>
+  
+  <!-- Legend -->
+  <rect x="20" y="20" width="200" height="60" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="120" y="40" class="title" font-size="12">Legend</text>
+  <line x1="30" y1="50" x2="60" y2="50" class="arrow"/>
+  <text x="70" y="55" class="text" font-size="10">Standard Connection</text>
+  <line x1="30" y1="65" x2="60" y2="65" class="secure-arrow"/>
+  <text x="70" y="70" class="text" font-size="10">Secure/Authenticated</text>
+  
+</svg>

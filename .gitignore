@@ -3,6 +3,41 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Azure Managed HSM and TLS Lab Specific Files
+# =============================================
+# Azure Credentials and Secrets
+*.pem
+*.pfx
+*.p12
+*.key
+*-credentials.json
+service-principal-*.json
+security-domain.json
+sd-wrapping-keys.json
+
+# Configuration files with secrets
+mhsm-pkcs11.conf
+*.conf
+!*.conf.template
+
+# Certificate files
+*.crt
+*.cer
+*.csr
+
+# Logs
+*.log
+logs/
+
+# Azure CLI cache
+.azure/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+# =============================================
+
 # User-specific files
 *.rsuser
 *.suo
