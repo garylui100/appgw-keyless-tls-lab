@@ -24,6 +24,8 @@ The solution integrates the following Azure services:
 
 ![Architecture Diagram](assets/images/architecture-diagram.svg)
 
+> **Note**: If the diagram above doesn't display properly, you can view the [text-based architecture overview](docs/architecture-overview.md).
+
 The architecture demonstrates the flow of keyless TLS operations:
 
 1. **Client Connection**: Clients connect to Application Gateway over HTTPS
@@ -31,6 +33,14 @@ The architecture demonstrates the flow of keyless TLS operations:
 3. **Cryptographic Operations**: The TLS Offload Library communicates with Managed HSM via PKCS#11 interface
 4. **Key Protection**: Private keys remain within the HSM and never leave the secure boundary
 5. **Backend Communication**: Application Gateway forwards decrypted traffic to backend servers
+
+#### Key Architectural Components:
+
+- **User Managed Identity**: Assigned to Application Gateway for secure HSM authentication (no shared secrets)
+- **Azure Managed HSM**: FIPS 140-2 Level 3 validated hardware for key storage and crypto operations
+- **TLS Offload Library**: PKCS#11 compliant interface for keyless TLS operations
+- **Azure Container Apps**: Modern, scalable backend services
+- **ARM Certificate Storage**: Certificates stored in Azure Resource Manager for streamlined management
 
 ## Prerequisites
 

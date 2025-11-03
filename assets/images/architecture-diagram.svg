@@ -40,7 +40,7 @@
   <!-- TLS Termination -->
   <rect x="435" y="95" width="100" height="35" class="box"/>
   <text x="485" y="110" class="text">TLS Termination</text>
-  <text x="485" y="122" class="text">& Load Balancing</text>
+  <text x="485" y="122" class="text">Load Balancing</text>
   
   <!-- TLS Offload Library -->
   <rect x="550" y="95" width="115" height="35" class="box"/>
@@ -51,8 +51,8 @@
   <rect x="70" y="250" width="140" height="80" class="identity-box"/>
   <text x="140" y="270" class="title">User Managed Identity</text>
   <text x="140" y="290" class="text">Assigned to App Gateway</text>
-  <text x="140" y="305" class="text">• HSM Authentication</text>
-  <text x="140" y="320" class="text">• No Shared Secrets</text>
+  <text x="140" y="305" class="text">HSM Authentication</text>
+  <text x="140" y="320" class="text">No Shared Secrets</text>
   
   <!-- Managed HSM -->
   <rect x="420" y="250" width="200" height="110" class="hsm-box"/>
@@ -61,7 +61,7 @@
   <!-- Private Keys -->
   <rect x="435" y="290" width="80" height="35" class="hsm-box"/>
   <text x="475" y="305" class="text">Private Keys</text>
-  <text x="475" y="317" class="text">&amp; Certificates</text>
+  <text x="475" y="317" class="text">Certificates</text>
   
   <!-- Crypto Operations -->
   <rect x="525" y="290" width="80" height="35" class="hsm-box"/>
@@ -74,16 +74,14 @@
   <text x="520" y="475" class="text">Web Applications</text>
   <text x="520" y="490" class="text">Azure Container Apps</text>
   
-  <!-- Arrows and Data Flow -->
-  
-  <!-- Client to Internet -->
+  <!-- Client to Internet Arrow -->
   <line x1="170" y1="115" x2="210" y2="115" class="arrow"/>
   <text x="190" y="110" class="text">HTTPS</text>
   
-  <!-- Internet to App Gateway -->
+  <!-- Internet to App Gateway Arrow -->
   <line x1="350" y1="115" x2="420" y2="115" class="arrow"/>
   
-  <!-- TLS Termination to TLS Offload -->
+  <!-- TLS Termination to TLS Offload Arrow -->
   <line x1="535" y1="112" x2="550" y2="112" class="arrow"/>
   
   <!-- App Gateway to Managed HSM (Direct Connection) -->
@@ -102,27 +100,27 @@
   <!-- Security Benefits Box -->
   <rect x="650" y="200" width="140" height="140" class="box" fill="#f0fff0"/>
   <text x="720" y="220" class="title">Security Benefits</text>
-  <text x="720" y="240" class="text">• Keys never leave HSM</text>
-  <text x="720" y="255" class="text">• FIPS 140-2 Level 3</text>
-  <text x="720" y="270" class="text">• Hardware security</text>
-  <text x="720" y="285" class="text">• Managed Identity auth</text>
-  <text x="720" y="300" class="text">• No shared secrets</text>
-  <text x="720" y="315" class="text">• Audit trails</text>
-  <text x="720" y="330" class="text">• Compliance ready</text>
+  <text x="720" y="240" class="text">Keys never leave HSM</text>
+  <text x="720" y="255" class="text">FIPS 140-2 Level 3</text>
+  <text x="720" y="270" class="text">Hardware security</text>
+  <text x="720" y="285" class="text">Managed Identity auth</text>
+  <text x="720" y="300" class="text">No shared secrets</text>
+  <text x="720" y="315" class="text">Audit trails</text>
+  <text x="720" y="330" class="text">Compliance ready</text>
   
   <!-- Key Features Box -->
   <rect x="650" y="360" width="140" height="100" class="box" fill="#fff8dc"/>
   <text x="720" y="380" class="title">Key Features</text>
-  <text x="720" y="400" class="text">• Keyless TLS</text>
-  <text x="720" y="415" class="text">• Certificate in ARM</text>
-  <text x="720" y="430" class="text">• Auto-scaling</text>
-  <text x="720" y="445" class="text">• Load balancing</text>
+  <text x="720" y="400" class="text">Keyless TLS</text>
+  <text x="720" y="415" class="text">Certificate in ARM</text>
+  <text x="720" y="430" class="text">Auto-scaling</text>
+  <text x="720" y="445" class="text">Load balancing</text>
   
   <!-- Data Flow Indicators -->
   <text x="400" y="55" class="text" fill="#666">1. TLS Handshake</text>
   <text x="270" y="195" class="text" fill="#666">2. Identity Auth</text>
   <text x="450" y="200" class="text" fill="#666">3. Crypto Ops</text>
-  <text x="575" y="300" class="text" fill="#666">4. Forwarding</text>
+  <text x="575" y="350" class="text" fill="#666">4. Forwarding</text>
   
   <!-- Legend -->
   <rect x="650" y="480" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
