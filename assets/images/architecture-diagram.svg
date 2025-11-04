@@ -6,6 +6,8 @@
       .azure-box { fill: #e6f3ff; stroke: #0078d4; stroke-width: 2; rx: 5; }
       .hsm-box { fill: #fff2e6; stroke: #ff8c00; stroke-width: 2; rx: 5; }
       .identity-box { fill: #f0fff0; stroke: #32cd32; stroke-width: 2; rx: 5; }
+      .benefits-box { fill: #fff5f5; stroke: #dc3545; stroke-width: 2; rx: 5; }
+      .features-box { fill: #f8f9fa; stroke: #6c757d; stroke-width: 2; rx: 5; }
       .text { font-family: Arial, sans-serif; font-size: 11px; text-anchor: middle; }
       .title { font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; text-anchor: middle; }
       .main-title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; }
@@ -110,23 +112,23 @@
   <text x="575" y="290" class="text">(Encrypted Traffic)</text>
   
   <!-- Security Benefits Box -->
-  <rect x="680" y="200" width="140" height="140" class="box" fill="#f9f9f9" stroke="#666"/>
-  <text x="750" y="220" class="title">Security Benefits</text>
-  <text x="750" y="240" class="text">Keys never leave HSM</text>
-  <text x="750" y="255" class="text">FIPS 140-2 Level 3</text>
-  <text x="750" y="270" class="text">Hardware security</text>
-  <text x="750" y="285" class="text">Managed Identity auth</text>
-  <text x="750" y="300" class="text">No shared secrets</text>
-  <text x="750" y="315" class="text">Audit trails</text>
-  <text x="750" y="330" class="text">Compliance ready</text>
+  <rect x="660" y="200" width="130" height="140" class="benefits-box"/>
+  <text x="725" y="220" class="title">Security Benefits</text>
+  <text x="725" y="240" class="text">Keys never leave HSM</text>
+  <text x="725" y="255" class="text">FIPS 140-2 Level 3</text>
+  <text x="725" y="270" class="text">Hardware security</text>
+  <text x="725" y="285" class="text">Managed Identity auth</text>
+  <text x="725" y="300" class="text">No shared secrets</text>
+  <text x="725" y="315" class="text">Audit trails</text>
+  <text x="725" y="330" class="text">Compliance ready</text>
   
   <!-- Key Features Box -->
-  <rect x="680" y="360" width="140" height="100" class="box" fill="#f5f5f5" stroke="#888"/>
-  <text x="750" y="380" class="title">Key Features</text>
-  <text x="750" y="400" class="text">Keyless TLS</text>
-  <text x="750" y="415" class="text">Certificate in ARM</text>
-  <text x="750" y="430" class="text">Auto-scaling</text>
-  <text x="750" y="445" class="text">Load balancing</text>
+  <rect x="660" y="360" width="130" height="100" class="features-box"/>
+  <text x="725" y="380" class="title">Key Features</text>
+  <text x="725" y="400" class="text">Keyless TLS</text>
+  <text x="725" y="415" class="text">Certificate in ARM</text>
+  <text x="725" y="430" class="text">Auto-scaling</text>
+  <text x="725" y="445" class="text">Load balancing</text>
   
   <!-- Legend -->
   <rect x="330" y="520" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
