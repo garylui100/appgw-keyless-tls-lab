@@ -58,36 +58,36 @@
   <text x="607" y="110" class="text">TLS Offload Library</text>
   <text x="607" y="122" class="text">(PKCS#11)</text>
   
-  <!-- User Managed Identity -->
-  <rect x="50" y="250" width="180" height="90" class="identity-box"/>
-  <text x="140" y="270" class="title">User Managed Identity</text>
-  <text x="140" y="290" class="text">Assigned to App Gateway</text>
-  <text x="140" y="305" class="text">HSM Authentication</text>
-  <text x="140" y="320" class="text">No Shared Secrets</text>
-  
-  <!-- Managed HSM -->
-  <rect x="420" y="250" width="200" height="120" class="hsm-box"/>
-  <text x="520" y="275" class="title">Azure Managed HSM</text>
+  <!-- Managed HSM (moved to left side) -->
+  <rect x="80" y="250" width="200" height="120" class="hsm-box"/>
+  <text x="180" y="275" class="title">Azure Managed HSM</text>
   
   <!-- Private Keys -->
-  <rect x="435" y="295" width="80" height="40" class="hsm-box"/>
-  <text x="475" y="310" class="text">Private Keys</text>
-  <text x="475" y="325" class="text">Certificates</text>
+  <rect x="95" y="295" width="80" height="40" class="hsm-box"/>
+  <text x="135" y="310" class="text">Private Keys</text>
+  <text x="135" y="325" class="text">Certificates</text>
   
   <!-- Crypto Operations -->
-  <rect x="525" y="295" width="80" height="40" class="hsm-box"/>
-  <text x="565" y="310" class="text">Crypto</text>
-  <text x="565" y="325" class="text">Operations</text>
+  <rect x="185" y="295" width="80" height="40" class="hsm-box"/>
+  <text x="225" y="310" class="text">Crypto</text>
+  <text x="225" y="325" class="text">Operations</text>
   
   <!-- Backend Servers -->
-  <rect x="420" y="440" width="200" height="80" class="azure-box"/>
-  <text x="520" y="465" class="title">Backend Servers</text>
-  <text x="520" y="485" class="text">Web Applications</text>
-  <text x="520" y="500" class="text">Azure Container Apps</text>
+  <rect x="420" y="380" width="200" height="80" class="azure-box"/>
+  <text x="520" y="405" class="title">Backend Servers</text>
+  <text x="520" y="425" class="text">Web Applications</text>
+  <text x="520" y="440" class="text">Azure Container Apps</text>
+  
+  <!-- User Managed Identity (moved to bottom left) -->
+  <rect x="50" y="480" width="180" height="90" class="identity-box"/>
+  <text x="140" y="505" class="title">User Managed Identity</text>
+  <text x="140" y="525" class="text">Assigned to App Gateway</text>
+  <text x="140" y="540" class="text">HSM Authentication</text>
+  <text x="140" y="555" class="text">No Shared Secrets</text>
   
   <!-- Client to Internet Arrow -->
   <line x1="170" y1="115" x2="210" y2="115" class="arrow"/>
-  <text x="190" y="110" class="text">HTTPS</text>
+  <text x="190" y="105" class="text">1. TLS Handshake</text>
   
   <!-- Internet to App Gateway Arrow -->
   <line x1="350" y1="115" x2="420" y2="115" class="arrow"/>
@@ -96,49 +96,44 @@
   <line x1="535" y1="112" x2="550" y2="112" class="arrow"/>
   
   <!-- App Gateway to Managed HSM (Direct Connection) -->
-  <line x1="550" y1="170" x2="520" y2="250" class="secure-arrow"/>
-  <text x="500" y="210" class="text" fill="#008000">PKCS#11 API</text>
+  <line x1="485" y1="170" x2="225" y2="250" class="secure-arrow"/>
+  <text x="355" y="210" class="text" fill="#008000">3. Crypto Ops</text>
+  <text x="355" y="225" class="text" fill="#008000">(PKCS#11 API)</text>
   
   <!-- User Managed Identity to Managed HSM Authentication -->
-  <line x1="230" y1="295" x2="420" y2="310" class="secure-arrow"/>
-  <text x="325" y="290" class="text" fill="#008000">Authentication</text>
+  <line x1="140" y1="480" x2="180" y2="370" class="secure-arrow"/>
+  <text x="120" y="425" class="text" fill="#008000">2. Identity Auth</text>
   
   <!-- App Gateway to Backend (Direct Connection) -->
-  <line x1="520" y1="170" x2="520" y2="440" class="arrow"/>
-  <text x="545" y="305" class="text">Encrypted</text>
-  <text x="545" y="320" class="text">Traffic</text>
+  <line x1="520" y1="170" x2="520" y2="380" class="arrow"/>
+  <text x="545" y="275" class="text">4. Forwarding</text>
+  <text x="545" y="290" class="text">(Encrypted Traffic)</text>
   
   <!-- Security Benefits Box -->
-  <rect x="650" y="200" width="140" height="140" class="box" fill="#f0fff0"/>
-  <text x="720" y="220" class="title">Security Benefits</text>
-  <text x="720" y="240" class="text">Keys never leave HSM</text>
-  <text x="720" y="255" class="text">FIPS 140-2 Level 3</text>
-  <text x="720" y="270" class="text">Hardware security</text>
-  <text x="720" y="285" class="text">Managed Identity auth</text>
-  <text x="720" y="300" class="text">No shared secrets</text>
-  <text x="720" y="315" class="text">Audit trails</text>
-  <text x="720" y="330" class="text">Compliance ready</text>
+  <rect x="320" y="350" width="140" height="140" class="box" fill="#f0fff0"/>
+  <text x="390" y="370" class="title">Security Benefits</text>
+  <text x="390" y="390" class="text">Keys never leave HSM</text>
+  <text x="390" y="405" class="text">FIPS 140-2 Level 3</text>
+  <text x="390" y="420" class="text">Hardware security</text>
+  <text x="390" y="435" class="text">Managed Identity auth</text>
+  <text x="390" y="450" class="text">No shared secrets</text>
+  <text x="390" y="465" class="text">Audit trails</text>
+  <text x="390" y="480" class="text">Compliance ready</text>
   
   <!-- Key Features Box -->
-  <rect x="650" y="360" width="140" height="100" class="box" fill="#fff8dc"/>
-  <text x="720" y="380" class="title">Key Features</text>
-  <text x="720" y="400" class="text">Keyless TLS</text>
-  <text x="720" y="415" class="text">Certificate in ARM</text>
-  <text x="720" y="430" class="text">Auto-scaling</text>
-  <text x="720" y="445" class="text">Load balancing</text>
-  
-  <!-- Data Flow Indicators -->
-  <text x="400" y="55" class="text" fill="#666">1. TLS Handshake</text>
-  <text x="270" y="195" class="text" fill="#666">2. Identity Auth</text>
-  <text x="450" y="200" class="text" fill="#666">3. Crypto Ops</text>
-  <text x="575" y="360" class="text" fill="#666">4. Forwarding</text>
+  <rect x="480" y="350" width="140" height="100" class="box" fill="#fff8dc"/>
+  <text x="550" y="370" class="title">Key Features</text>
+  <text x="550" y="390" class="text">Keyless TLS</text>
+  <text x="550" y="405" class="text">Certificate in ARM</text>
+  <text x="550" y="420" class="text">Auto-scaling</text>
+  <text x="550" y="435" class="text">Load balancing</text>
   
   <!-- Legend -->
-  <rect x="650" y="480" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
-  <text x="720" y="500" class="title">Legend</text>
-  <line x1="665" y1="515" x2="685" y2="515" class="legend-arrow"/>
-  <text x="720" y="520" class="text" fill="#333">Standard Flow</text>
-  <line x1="665" y1="535" x2="685" y2="535" class="legend-secure-arrow"/>
-  <text x="720" y="540" class="text" fill="#008000">Secure/Auth</text>
+  <rect x="650" y="380" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="720" y="400" class="title">Legend</text>
+  <line x1="665" y1="415" x2="685" y2="415" class="legend-arrow"/>
+  <text x="720" y="420" class="text" fill="#333">Standard Flow</text>
+  <line x1="665" y1="435" x2="685" y2="435" class="legend-secure-arrow"/>
+  <text x="720" y="440" class="text" fill="#008000">Secure/Auth</text>
   
 </svg>
