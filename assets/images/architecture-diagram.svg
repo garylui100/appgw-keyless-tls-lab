@@ -116,7 +116,7 @@
   <!-- Security Benefits Box -->
   <rect x="660" y="200" width="130" height="140" class="benefits-box"/>
   <text x="725" y="220" class="title">Security Benefits</text>
-  <text x="725" y="240" class="text">Keys never leave HSM</text>
+  <text x="725" y="240" class="text">Private keys never leave HSM</text>
   <text x="725" y="255" class="text">FIPS 140-2 Level 3</text>
   <text x="725" y="270" class="text">Hardware security</text>
   <text x="725" y="285" class="text">Managed Identity auth</text>
