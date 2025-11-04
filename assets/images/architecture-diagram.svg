@@ -114,15 +114,15 @@
   <text x="575" y="290" class="text">(Encrypted Traffic)</text>
   
   <!-- Security Benefits Box -->
-  <rect x="660" y="200" width="130" height="140" class="benefits-box"/>
-  <text x="725" y="220" class="title">Security Benefits</text>
-  <text x="725" y="240" class="text">Private keys never leave HSM</text>
-  <text x="725" y="255" class="text">FIPS 140-2 Level 3</text>
-  <text x="725" y="270" class="text">Hardware security</text>
-  <text x="725" y="285" class="text">Managed Identity auth</text>
-  <text x="725" y="300" class="text">No shared secrets</text>
-  <text x="725" y="315" class="text">Audit trails</text>
-  <text x="725" y="330" class="text">Compliance ready</text>
+  <rect x="640" y="200" width="150" height="140" class="benefits-box"/>
+  <text x="715" y="220" class="title">Security Benefits</text>
+  <text x="715" y="240" class="text">Private keys never leave HSM</text>
+  <text x="715" y="255" class="text">FIPS 140-2 Level 3</text>
+  <text x="715" y="270" class="text">Hardware security</text>
+  <text x="715" y="285" class="text">Managed Identity auth</text>
+  <text x="715" y="300" class="text">No shared secrets</text>
+  <text x="715" y="315" class="text">Audit trails</text>
+  <text x="715" y="330" class="text">Compliance ready</text>
   
   <!-- Legend -->
   <rect x="330" y="520" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
