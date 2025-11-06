@@ -110,8 +110,8 @@
   
   <!-- App Gateway to Backend (Direct Connection) -->
   <line x1="550" y1="170" x2="550" y2="380" class="arrow"/>
-  <text x="575" y="275" class="text">4. Forwarding</text>
-  <text x="575" y="290" class="text">(Encrypted Traffic)</text>
+  <text x="575" y="275" class="text">4. TLS Re-encryption</text>
+  <text x="575" y="290" class="text">(Standard TLS)</text>
   
   <!-- Security Benefits Box -->
   <rect x="640" y="200" width="150" height="140" class="benefits-box"/>

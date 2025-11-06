@@ -1,15 +1,16 @@
 # Application Gateway and Managed HSM Keyless TLS Integration Lab
 
-A comprehensive hands-on lab demonstrating the integration process for Keyless TLS with Azure Application Gateway and Azure Managed HSM. This lab provides step-by-step guidance to configure secure TLS termination using hardware security modules without exposing private keys.
+A comprehensive hands-on lab demonstrating keyless TLS integration between Azure Application Gateway and Azure Managed HSM. This lab provides step-by-step guidance for configuring secure TLS termination where private keys remain protected within FIPS 140-2 Level 3 hardware security modules and are never exposed or transmitted. The solution implements end-to-end encryption with keyless TLS on the client-side/edge and standard TLS re-encryption to backend servers.
 
 ## Overview
 
 Keyless TLS is a security enhancement that allows TLS certificate private keys to remain within a Hardware Security Module (HSM) while still enabling TLS termination at the Application Gateway. This approach provides several benefits:
 
 - **Enhanced Security**: Private keys never leave the HSM environment
-- **Compliance**: Meets regulatory requirements for cryptographic key protection
+- **FIPS 140-2 Level 3 Compliance**: Meets government-grade cryptographic security standards and regulatory requirements for sensitive key material protection
 - **Centralized Key Management**: Single source of truth for cryptographic operations
-- **Hardware-backed Security**: Leverages FIPS 140-2 Level 3 validated HSMs
+- **Tamper-Resistant Hardware**: Physical security modules with tamper detection and automatic key zeroization capabilities
+- **Dedicated High Performance**: Unlike Azure Key Vault's shared infrastructure, Managed HSM provides dedicated resources with higher throughput and no throttling limits for cryptographic operations
 
 ## Architecture
 
@@ -17,8 +18,7 @@ The solution integrates the following Azure services:
 
 - **Azure Application Gateway**: Provides TLS termination and load balancing
 - **Azure Managed HSM**: Stores private keys and performs cryptographic operations
-- **Azure Key Vault**: Optional certificate storage and management
-- **PKCS#11 Interface**: Standard cryptographic token interface for HSM communication
+- **Linux VM/Container**: Hosts OpenSSL and e_akv.so library for certificate operations and HSM integration
 
 ### High-Level Architecture Diagram
 
@@ -28,11 +28,10 @@ The solution integrates the following Azure services:
 
 The architecture demonstrates the flow of keyless TLS operations:
 
-1. **Client Connection**: Clients connect to Application Gateway over HTTPS
-2. **TLS Termination**: Application Gateway terminates TLS using the TLS Offload Library
-3. **Cryptographic Operations**: The TLS Offload Library communicates with Managed HSM via PKCS#11 interface
-4. **Key Protection**: Private keys remain within the HSM and never leave the secure boundary
-5. **Backend Communication**: Application Gateway forwards decrypted traffic to backend servers
+1. **TLS Handshake**: Client initiates secure connection with Application Gateway
+2. **Identity Authentication**: User Managed Identity authenticates with Azure Managed HSM
+3. **Cryptographic Operations**: Application Gateway performs crypto operations via HSM using PKCS#11 interface
+4. **TLS Re-encryption**: Application Gateway re-encrypts and forwards traffic to backend servers using standard TLS
 
 #### Key Architectural Components:
 
