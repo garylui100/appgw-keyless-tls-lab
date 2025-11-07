@@ -8,6 +8,7 @@
       .identity-box { fill: #f0fff0; stroke: #32cd32; stroke-width: 2; rx: 5; }
       .benefits-box { fill: #fff5f5; stroke: #dc3545; stroke-width: 2; rx: 5; }
       .features-box { fill: #f8f9fa; stroke: #6c757d; stroke-width: 2; rx: 5; }
+      .linux-box { fill: #f5f5f5; stroke: #6c757d; stroke-width: 2; rx: 5; }
       .text { font-family: Arial, sans-serif; font-size: 11px; text-anchor: middle; }
       .title { font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; text-anchor: middle; }
       .main-title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; }
@@ -74,6 +75,12 @@
   <text x="225" y="310" class="text">Crypto</text>
   <text x="225" y="325" class="text">Operations</text>
   
+  <!-- Linux VM -->
+  <rect x="320" y="250" width="120" height="80" class="linux-box"/>
+  <text x="380" y="275" class="title">Linux VM</text>
+  <text x="380" y="295" class="text">Certificate Generation</text>
+  <text x="380" y="310" class="text">OpenSSL & e_akv.so</text>
+  
   <!-- Backend Servers -->
   <rect x="450" y="380" width="200" height="80" class="azure-box"/>
   <text x="550" y="405" class="title">Backend Servers</text>
@@ -113,16 +120,14 @@
   <text x="575" y="275" class="text">4. TLS Re-encryption</text>
   <text x="575" y="290" class="text">(Standard TLS)</text>
   
-  <!-- Security Benefits Box -->
-  <rect x="640" y="200" width="150" height="140" class="benefits-box"/>
-  <text x="715" y="220" class="title">Security Benefits</text>
-  <text x="715" y="240" class="text">Private keys never leave HSM</text>
-  <text x="715" y="255" class="text">FIPS 140-2 Level 3</text>
-  <text x="715" y="270" class="text">Hardware security</text>
-  <text x="715" y="285" class="text">Managed Identity auth</text>
-  <text x="715" y="300" class="text">No shared secrets</text>
-  <text x="715" y="315" class="text">Audit trails</text>
-  <text x="715" y="330" class="text">Compliance ready</text>
+  <!-- Linux VM to Managed HSM (Certificate Generation) -->
+  <line x1="320" y1="290" x2="280" y2="290" class="secure-arrow"/>
+  <text x="300" y="340" class="text" fill="#008000">Cert Generation</text>
+  
+  <!-- Linux VM to Application Gateway (Certificate Delivery) -->
+  <line x1="440" y1="280" x2="465" y2="130" class="arrow"/>
+  <text x="480" y="200" class="text">Certificate</text>
+  <text x="480" y="215" class="text">Delivery</text>
   
   <!-- Legend -->
   <rect x="330" y="520" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
