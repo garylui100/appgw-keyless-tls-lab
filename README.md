@@ -130,7 +130,7 @@ echo "Application Gateway: $APPGW_NAME"
 
 After setting up your environment variables, they should look similar to this example:
 
-![Configured Environment Variables](assets/images/environment-variables-example.png)
+![Configured Environment Variables](assets/images/Setup_Environment_Variables.png)
 
 > **Note**: This screenshot shows an example configuration with actual values. Your actual values will be different based on your specific setup and naming preferences.
 
