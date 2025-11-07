@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <style>
-      .box { fill: #f0f8ff; stroke: #4682b4; stroke-width: 2; rx: 5; }
-      .azure-box { fill: #e6f3ff; stroke: #0078d4; stroke-width: 2; rx: 5; }
-      .hsm-box { fill: #fff2e6; stroke: #ff8c00; stroke-width: 2; rx: 5; }
-      .identity-box { fill: #f0fff0; stroke: #32cd32; stroke-width: 2; rx: 5; }
-      .benefits-box { fill: #fff5f5; stroke: #dc3545; stroke-width: 2; rx: 5; }
-      .features-box { fill: #f8f9fa; stroke: #6c757d; stroke-width: 2; rx: 5; }
-      .linux-box { fill: #f5f5f5; stroke: #6c757d; stroke-width: 2; rx: 5; }
       .text { font-family: Arial, sans-serif; font-size: 11px; text-anchor: middle; }
       .title { font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; text-anchor: middle; }
       .main-title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; }
@@ -16,6 +9,10 @@
       .secure-arrow { stroke: #008000; stroke-width: 3; stroke-dasharray: 5,5; marker-end: url(#arrowhead-secure); }
       .legend-arrow { stroke: #333; stroke-width: 1; marker-end: url(#legend-arrowhead); }
       .legend-secure-arrow { stroke: #008000; stroke-width: 1; stroke-dasharray: 3,3; marker-end: url(#legend-arrowhead-secure); }
+      .legend-cert-arrow { stroke: #0066cc; stroke-width: 1; marker-end: url(#legend-arrowhead-cert); }
+      .cert-arrow { stroke: #0066cc; stroke-width: 2; marker-end: url(#arrowhead-cert); }
+      .component-box { fill: #f8f9fa; stroke: #6c757d; stroke-width: 1; rx: 8; }
+      .azure-component-box { fill: #e6f3ff; stroke: #0078d4; stroke-width: 1; rx: 8; }
     </style>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
@@ -29,6 +26,19 @@
     <marker id="legend-arrowhead-secure" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
       <polygon points="0 0, 6 2, 0 4" fill="#008000" />
     </marker>
+    <marker id="arrowhead-cert" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0066cc" />
+    </marker>
+    <marker id="legend-arrowhead-cert" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+      <polygon points="0 0, 6 2, 0 4" fill="#0066cc" />
+    </marker>
+    
+    <!-- Gradient definitions -->
+    <linearGradient id="app-gateway-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5e9624"/>
+      <stop offset="50%" stop-color="#6dad2a"/>
+      <stop offset="100%" stop-color="#76bc2d"/>
+    </linearGradient>
   </defs>
   
   <!-- Background -->
@@ -38,8 +48,8 @@
   <text x="400" y="25" class="main-title">Application Gateway - Managed HSM Keyless TLS Architecture</text>
   
   <!-- Client -->
-  <rect x="30" y="80" width="120" height="70" class="box"/>
-  <text x="90" y="105" class="title">Client</text>
+  <rect x="30" y="80" width="120" height="70" class="component-box"/>
+  <text x="90" y="110" class="title">Client</text>
   <text x="90" y="125" class="text">Web Browser</text>
   <text x="90" y="140" class="text">Mobile App</text>
   
@@ -48,53 +58,55 @@
   <text x="300" y="120" class="text">Internet</text>
   
   <!-- Application Gateway -->
-  <rect x="450" y="60" width="260" height="110" class="azure-box"/>
-  <text x="580" y="80" class="title">Azure Application Gateway</text>
+  <rect x="450" y="60" width="260" height="110" class="azure-component-box"/>
+  <text x="580" y="90" class="title">Azure Application Gateway</text>
   
   <!-- TLS Termination -->
-  <rect x="465" y="95" width="100" height="35" class="box"/>
-  <text x="515" y="110" class="text">TLS Termination</text>
-  <text x="515" y="122" class="text">Load Balancing</text>
+  <rect x="465" y="95" width="100" height="40" class="component-box"/>
+  <text x="515" y="112" class="text">TLS Termination</text>
+  <text x="515" y="125" class="text">Load Balancing</text>
   
   <!-- TLS Offload Library -->
-  <rect x="580" y="95" width="115" height="35" class="box"/>
-  <text x="637" y="110" class="text">TLS Offload Library</text>
-  <text x="637" y="122" class="text">(PKCS#11)</text>
+  <rect x="580" y="95" width="115" height="40" class="component-box"/>
+  <text x="637" y="112" class="text">TLS Offload Library</text>
+  <text x="637" y="125" class="text">(PKCS#11)</text>
   
-  <!-- Managed HSM (left side with more space) -->
-  <rect x="50" y="280" width="220" height="130" class="hsm-box"/>
+  <!-- Managed HSM -->
+  <rect x="50" y="280" width="220" height="130" class="azure-component-box"/>
   <text x="160" y="305" class="title">Azure Managed HSM</text>
   
   <!-- Private Keys -->
-  <rect x="65" y="325" width="90" height="45" class="hsm-box"/>
-  <text x="110" y="345" class="text">Private Keys</text>
-  <text x="110" y="360" class="text">Certificates</text>
+  <rect x="65" y="320" width="90" height="50" class="component-box"/>
+  <text x="110" y="340" class="text">Private Keys</text>
+  <text x="110" y="355" class="text">Certificates</text>
   
   <!-- Crypto Operations -->
-  <rect x="165" y="325" width="90" height="45" class="hsm-box"/>
-  <text x="210" y="345" class="text">Crypto</text>
-  <text x="210" y="360" class="text">Operations</text>
+  <rect x="165" y="320" width="90" height="50" class="component-box"/>
+  <text x="210" y="340" class="text">Crypto</text>
+  <text x="210" y="355" class="text">Operations</text>
   
   <!-- Linux VM -->
-  <rect x="350" y="320" width="140" height="90" class="linux-box"/>
-  <text x="420" y="345" class="title">Linux VM</text>
-  <text x="420" y="365" class="text">Certificate Generation</text>
-  <text x="420" y="380" class="text">OpenSSL &amp; e_akv.so</text>
-  <text x="420" y="395" class="text">PKCS#11 Interface</text>
+  <rect x="380" y="320" width="140" height="90" class="azure-component-box"/>
+  <text x="450" y="345" class="title">Linux VM</text>
+  <text x="450" y="365" class="text">Certificate Generation</text>
+  <text x="450" y="380" class="text">OpenSSL &amp; e_akv.so</text>
+  <text x="450" y="395" class="text">PKCS#11 Interface</text>
   
   <!-- Backend Servers -->
-  <rect x="580" y="420" width="180" height="90" class="azure-box"/>
+  <rect x="580" y="420" width="180" height="90" class="azure-component-box"/>
   <text x="670" y="445" class="title">Backend Servers</text>
   <text x="670" y="465" class="text">Web Applications</text>
   <text x="670" y="480" class="text">Azure Container Apps</text>
   <text x="670" y="495" class="text">Microservices</text>
   
-  <!-- User Managed Identity (bottom left with more space) -->
-  <rect x="30" y="500" width="200" height="80" class="identity-box"/>
-  <text x="130" y="525" class="title">User Managed Identity</text>
-  <text x="130" y="545" class="text">Assigned to App Gateway</text>
-  <text x="130" y="560" class="text">HSM Authentication</text>
-  <text x="130" y="575" class="text">No Shared Secrets</text>
+  <!-- User Managed Identity -->
+  <rect x="30" y="500" width="240" height="85" class="azure-component-box"/>
+  <text x="150" y="525" class="title">User Managed Identity</text>
+  <text x="150" y="545" class="text">Assigned to App Gateway</text>
+  <text x="150" y="560" class="text">HSM Authentication</text>
+  <text x="150" y="575" class="text">No Shared Secrets</text>
+  
+  <!-- Connection Arrows -->
   
   <!-- Client to Internet Arrow -->
   <line x1="150" y1="115" x2="230" y2="115" class="arrow"/>
@@ -108,35 +120,36 @@
   <!-- TLS Termination to TLS Offload Arrow -->
   <line x1="565" y1="112" x2="580" y2="112" class="arrow"/>
   
-  <!-- App Gateway to Linux VM (Direct Connection) -->
-  <line x1="515" y1="170" x2="420" y2="320" class="secure-arrow"/>
-  <text x="467" y="245" class="text" fill="#008000">3. Crypto Ops</text>
-  <text x="467" y="260" class="text" fill="#008000">(PKCS#11 API)</text>
+  <!-- App Gateway to Managed HSM (Direct Connection) -->
+  <line x1="515" y1="170" x2="160" y2="280" class="secure-arrow"/>
+  <text x="337" y="215" class="text" fill="#008000">3. Crypto Ops</text>
+  <text x="337" y="230" class="text" fill="#008000">(PKCS#11 API)</text>
   
   <!-- User Managed Identity to Managed HSM Authentication -->
-  <line x1="130" y1="500" x2="160" y2="410" class="secure-arrow"/>
-  <text x="100" y="455" class="text" fill="#008000">2. Identity Auth</text>
+  <line x1="150" y1="500" x2="160" y2="410" class="secure-arrow"/>
+  <text x="120" y="455" class="text" fill="#008000">2. Identity Auth</text>
   
   <!-- App Gateway to Backend (Direct Connection) -->
   <line x1="580" y1="170" x2="670" y2="420" class="arrow"/>
   <text x="625" y="295" class="text">4. TLS Re-encryption</text>
   <text x="625" y="310" class="text">(Standard TLS)</text>
   
-  <!-- Linux VM to Managed HSM (Certificate Generation) -->
-  <line x1="350" y1="365" x2="270" y2="365" class="secure-arrow"/>
-  <text x="310" y="385" class="text" fill="#008000">Key Access</text>
+  <!-- Linux VM to Managed HSM (CSR Generation) -->
+  <line x1="380" y1="365" x2="270" y2="365" class="cert-arrow"/>
+  <text x="325" y="385" class="text" fill="#0066cc">CSR Generation</text>
   
-  <!-- Linux VM Certificate Operations -->
-  <text x="420" y="280" class="text" fill="#666">Certificate Generation</text>
-  <text x="480" y="200" class="text">Certificate</text>
-  <text x="480" y="215" class="text">Delivery</text>
+  <!-- Linux VM to Application Gateway (Supply Public Cert) -->
+  <line x1="450" y1="320" x2="515" y2="170" class="cert-arrow"/>
+  <text x="482" y="245" class="text" fill="#0066cc">Supply Public Cert</text>
   
   <!-- Legend -->
-  <rect x="330" y="520" width="140" height="70" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
-  <text x="400" y="540" class="title">Legend</text>
-  <line x1="345" y1="555" x2="365" y2="555" class="legend-arrow"/>
-  <text x="400" y="560" class="text" fill="#333">Standard Flow</text>
-  <line x1="345" y1="575" x2="365" y2="575" class="legend-secure-arrow"/>
-  <text x="400" y="580" class="text" fill="#008000">Secure/Auth</text>
+  <rect x="330" y="480" width="140" height="90" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="400" y="500" class="title">Legend</text>
+  <line x1="345" y1="515" x2="365" y2="515" class="legend-arrow"/>
+  <text x="400" y="520" class="text" fill="#333">Standard Flow</text>
+  <line x1="345" y1="535" x2="365" y2="535" class="legend-secure-arrow"/>
+  <text x="400" y="540" class="text" fill="#008000">Secure/Auth</text>
+  <line x1="345" y1="555" x2="365" y2="555" class="legend-cert-arrow"/>
+  <text x="400" y="560" class="text" fill="#0066cc">Cert/CSR</text>
   
 </svg>
