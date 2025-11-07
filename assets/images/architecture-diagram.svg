@@ -79,7 +79,7 @@
   <rect x="320" y="250" width="120" height="80" class="linux-box"/>
   <text x="380" y="275" class="title">Linux VM</text>
   <text x="380" y="295" class="text">Certificate Generation</text>
-  <text x="380" y="310" class="text">OpenSSL & e_akv.so</text>
+  <text x="380" y="310" class="text">OpenSSL &amp; e_akv.so</text>
   
   <!-- Backend Servers -->
   <rect x="450" y="380" width="200" height="80" class="azure-box"/>
