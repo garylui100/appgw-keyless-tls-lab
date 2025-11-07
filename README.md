@@ -60,21 +60,95 @@ Before starting this lab, ensure you have:
 
 ## Lab Sections
 
-### 1. Environment Setup
+### 1. Environment Variables Setup
+
+#### Azure CLI Authentication
+
+First, open the Cloud Shell in Azure Portal, then authenticate with Azure CLI and select the subscription where you have owner role permissions:
+
+```bash
+# Login to Azure CLI (will prompt you to select subscription if you have multiple)
+az login
+
+# Verify the current subscription
+az account show --output table
+```
+
+#### Environment Variables
+
+Set up the required environment variables for the lab. **Replace all placeholder values with your own values**:
+
+```bash
+# Access token for Azure Management API (keep this as-is)
+TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken --output tsv)
+
+# Azure subscription and resource group - REPLACE WITH YOUR VALUES
+export SUBSCRIPTION_ID="<your-subscription-id>"
+export RESOURCE_GROUP="<your-resource-group-name>"
+export LOCATION="<your-preferred-location>"
+
+# Application Gateway configuration - REPLACE WITH YOUR VALUES
+export APPGW_NAME="<your-app-gateway-name>"
+export VNET_NAME="<your-vnet-name>"
+export ADDRESS_PREFIX="<your-address-prefix>"
+export APPGW_SUBNET="<your-appgw-subnet-name>"
+export APPGW_SUBNET_PREFIX="<your-appgw-subnet-prefix>"
+export BACKEND_POOL="<your-backend-pool-name>"
+export BACKEND_SUBNET="<your-backend-subnet-name>"
+export BACKEND_SUBNET_PREFIX="<your-backend-subnet-prefix>"
+export HTTPS_SETTING_NAME="<your-https-setting-name>"
+export PROBE_NAME="<your-probe-name>"
+export APPGW_PIP_NAME="<your-public-ip-name>"
+
+# Container Apps configuration - REPLACE WITH YOUR VALUES
+export ACA_ENV="<your-container-apps-env-name>"
+export ACA_NAME="<your-container-app-name>"
+
+# Managed Identity and HSM configuration - REPLACE WITH YOUR VALUES
+export MI_NAME="<your-managed-identity-name>"
+export MHSM_NAME="<your-managed-hsm-name>"
+export SECURITY_DOMAIN="<your-security-domain-file>"
+export PRIVATE_KEY="<your-private-key-name>"
+
+# Certificate configuration - REPLACE WITH YOUR VALUES
+export SSCERT_PASSWD="<your-certificate-password>"
+export SSCERT_NAME="<your-certificate-name>"
+export SSCERT_FILE="<your-certificate-file>"
+export LISTENER="<your-https-listener-name>"
+export HTTPS_PORT="<your-frontend-port-name>"
+
+echo "Environment variables set successfully!"
+echo "Resource Group: $RESOURCE_GROUP"
+echo "Location: $LOCATION"
+echo "Managed HSM: $MHSM_NAME"
+echo "Application Gateway: $APPGW_NAME"
+```
+
+> **Important**: Replace all placeholder values (enclosed in `< >`) with your own values. Only the `TOKEN` variable should remain as-is since it dynamically retrieves the access token.
+
+#### Example: Configured Environment Variables
+
+After setting up your environment variables, they should look similar to this example:
+
+![Configured Environment Variables](assets/images/environment-variables-example.png)
+
+> **Note**: This screenshot shows an example configuration with actual values. Your actual values will be different based on your specific setup and naming preferences.
+
+### 2. Infrastructure Deployment
 - [Deploy Azure Managed HSM](docs/01-deploy-managed-hsm.md)
 - [Configure Service Principals](docs/02-configure-service-principals.md)
 - [Set up Role Assignments](docs/03-setup-role-assignments.md)
 
-### 2. Key Management
+### 3. Key Management
 - [Generate TLS Keys in Managed HSM](docs/04-generate-tls-keys.md)
 - [Configure Key Labels and Access](docs/05-configure-key-access.md)
 
-### 3. Application Gateway Configuration
+### 4. Application Gateway Configuration
 - [Deploy Application Gateway](docs/06-deploy-application-gateway.md)
 - [Configure TLS Offload Library](docs/07-configure-tls-offload.md)
 - [Set up Keyless TLS](docs/08-setup-keyless-tls.md)
 
-### 4. Testing and Validation
+### 5. Testing and Validation
 - [Test TLS Handshake](docs/09-test-tls-handshake.md)
 - [Validate Security Configuration](docs/10-validate-security.md)
 - [Performance Testing](docs/11-performance-testing.md)
