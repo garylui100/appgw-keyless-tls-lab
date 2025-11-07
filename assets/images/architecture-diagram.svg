@@ -76,11 +76,11 @@
   <text x="210" y="360" class="text">Operations</text>
   
   <!-- Linux VM -->
-  <rect x="350" y="220" width="140" height="90" class="linux-box"/>
-  <text x="420" y="245" class="title">Linux VM</text>
-  <text x="420" y="265" class="text">Certificate Generation</text>
-  <text x="420" y="280" class="text">OpenSSL &amp; e_akv.so</text>
-  <text x="420" y="295" class="text">PKCS#11 Interface</text>
+  <rect x="350" y="320" width="140" height="90" class="linux-box"/>
+  <text x="420" y="345" class="title">Linux VM</text>
+  <text x="420" y="365" class="text">Certificate Generation</text>
+  <text x="420" y="380" class="text">OpenSSL &amp; e_akv.so</text>
+  <text x="420" y="395" class="text">PKCS#11 Interface</text>
   
   <!-- Backend Servers -->
   <rect x="580" y="420" width="180" height="90" class="azure-box"/>
@@ -109,9 +109,9 @@
   <line x1="565" y1="112" x2="580" y2="112" class="arrow"/>
   
   <!-- App Gateway to Linux VM (Direct Connection) -->
-  <line x1="515" y1="170" x2="420" y2="220" class="secure-arrow"/>
-  <text x="467" y="195" class="text" fill="#008000">3. Crypto Ops</text>
-  <text x="467" y="210" class="text" fill="#008000">(PKCS#11 API)</text>
+  <line x1="515" y1="170" x2="420" y2="320" class="secure-arrow"/>
+  <text x="467" y="245" class="text" fill="#008000">3. Crypto Ops</text>
+  <text x="467" y="260" class="text" fill="#008000">(PKCS#11 API)</text>
   
   <!-- User Managed Identity to Managed HSM Authentication -->
   <line x1="130" y1="500" x2="160" y2="410" class="secure-arrow"/>
@@ -123,11 +123,11 @@
   <text x="625" y="310" class="text">(Standard TLS)</text>
   
   <!-- Linux VM to Managed HSM (Certificate Generation) -->
-  <line x1="350" y1="310" x2="270" y2="345" class="secure-arrow"/>
-  <text x="310" y="375" class="text" fill="#008000">Key Access</text>
+  <line x1="350" y1="365" x2="270" y2="365" class="secure-arrow"/>
+  <text x="310" y="385" class="text" fill="#008000">Key Access</text>
   
   <!-- Linux VM Certificate Operations -->
-  <text x="420" y="180" class="text" fill="#666">Certificate Generation</text>
+  <text x="420" y="280" class="text" fill="#666">Certificate Generation</text>
   <text x="480" y="200" class="text">Certificate</text>
   <text x="480" y="215" class="text">Delivery</text>
   
