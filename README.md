@@ -29,13 +29,13 @@ The solution integrates the following Azure services:
 The architecture demonstrates the flow of keyless TLS operations:
 
 1. **TLS Handshake**: Client initiates secure connection with Application Gateway
-2. **Identity Authentication**: User Managed Identity authenticates with Azure Managed HSM
+2. **Identity Authentication**: Application Gateway authenticates with Azure Managed HSM using managed identity
 3. **Cryptographic Operations**: Application Gateway performs crypto operations via HSM using PKCS#11 interface
 4. **TLS Re-encryption**: Application Gateway re-encrypts and forwards traffic to backend servers using standard TLS
 
 #### Key Architectural Components:
 
-- **Azure Application Gateway**: Load balancer with TLS termination capabilities and integrated TLS Offload Library (PKCS#11) for keyless TLS operations
+- **Azure Application Gateway**: Layer-7 load balancer with TLS termination capabilities and integrated TLS Offload Library (PKCS#11) for keyless TLS operations
 - **Azure Managed HSM**: FIPS 140-2 Level 3 validated hardware security module for private key storage and cryptographic operations
 - **Linux VM**: Virtual machine hosting certificate generation tools, OpenSSL, and e_akv.so library with PKCS#11 interface for HSM integration
 - **Backend Servers**: Target applications including web applications, Azure Container Apps, and microservices that receive re-encrypted TLS traffic
@@ -44,21 +44,19 @@ The architecture demonstrates the flow of keyless TLS operations:
 
 Before starting this lab, ensure you have:
 
-### Azure Resources
-- Azure subscription with appropriate permissions
-- Resource Group for deploying resources
-- Virtual Network with appropriate subnets
-- Service Principal with required permissions
+### Azure Lab Environment
+- Azure subscription with owner role permissions
+- Access to Azure portal and Cloud Shell
 
 ### Required Permissions
 - **Managed HSM Crypto Officer** role for initial setup
 - **Managed HSM Crypto User** role for key operations
-- **Application Gateway Contributor** role for gateway configuration
+- **RBAC Owner** role for granting access to other Azure resources
 
 ### Software Requirements
 - Azure CLI or Azure PowerShell
 - OpenSSL for certificate operations
-- Azure Managed HSM TLS Offload Library
+- Azure Managed HSM TLS Offload Library (e_akv.so)
 
 ## Lab Sections
 
