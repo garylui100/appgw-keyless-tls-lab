@@ -35,11 +35,10 @@ The architecture demonstrates the flow of keyless TLS operations:
 
 #### Key Architectural Components:
 
-- **User Managed Identity**: Assigned to Application Gateway for secure HSM authentication (no shared secrets)
-- **Azure Managed HSM**: FIPS 140-2 Level 3 validated hardware for key storage and crypto operations
-- **TLS Offload Library**: PKCS#11 compliant interface for keyless TLS operations
-- **Azure Container Apps**: Modern, scalable backend services
-- **ARM Certificate Storage**: Certificates stored in Azure Resource Manager for streamlined management
+- **Azure Application Gateway**: Load balancer with TLS termination capabilities and integrated TLS Offload Library (PKCS#11) for keyless TLS operations
+- **Azure Managed HSM**: FIPS 140-2 Level 3 validated hardware security module for private key storage and cryptographic operations
+- **Linux VM**: Virtual machine hosting certificate generation tools, OpenSSL, and e_akv.so library with PKCS#11 interface for HSM integration
+- **Backend Servers**: Target applications including web applications, Azure Container Apps, and microservices that receive re-encrypted TLS traffic
 
 ## Prerequisites
 

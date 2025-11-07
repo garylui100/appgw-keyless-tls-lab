@@ -58,53 +58,51 @@
   <text x="300" y="120" class="text">Internet</text>
   
   <!-- Application Gateway -->
-  <rect x="450" y="60" width="260" height="110" class="azure-component-box"/>
-  <text x="580" y="90" class="title">Azure Application Gateway</text>
+  <rect x="450" y="60" width="260" height="140" class="azure-component-box"/>
+  <text x="580" y="85" class="title">Azure Application Gateway</text>
   
   <!-- TLS Termination -->
-  <rect x="465" y="95" width="100" height="40" class="component-box"/>
-  <text x="515" y="112" class="text">TLS Termination</text>
-  <text x="515" y="125" class="text">Load Balancing</text>
+  <rect x="470" y="95" width="95" height="35" class="component-box"/>
+  <text x="517" y="110" class="text">TLS Termination</text>
+  <text x="517" y="122" class="text">Load Balancing</text>
   
   <!-- TLS Offload Library -->
-  <rect x="580" y="95" width="115" height="40" class="component-box"/>
-  <text x="637" y="112" class="text">TLS Offload Library</text>
-  <text x="637" y="125" class="text">(PKCS#11)</text>
-  
-  <!-- Managed HSM -->
-  <rect x="50" y="280" width="220" height="130" class="azure-component-box"/>
-  <text x="160" y="305" class="title">Azure Managed HSM</text>
-  
-  <!-- Private Keys -->
-  <rect x="65" y="320" width="90" height="50" class="component-box"/>
-  <text x="110" y="340" class="text">Private Keys</text>
-  <text x="110" y="355" class="text">Certificates</text>
-  
-  <!-- Crypto Operations -->
-  <rect x="165" y="320" width="90" height="50" class="component-box"/>
-  <text x="210" y="340" class="text">Crypto</text>
-  <text x="210" y="355" class="text">Operations</text>
-  
-  <!-- Linux VM -->
-  <rect x="380" y="320" width="140" height="90" class="azure-component-box"/>
-  <text x="450" y="345" class="title">Linux VM</text>
-  <text x="450" y="365" class="text">Certificate Generation</text>
-  <text x="450" y="380" class="text">OpenSSL &amp; e_akv.so</text>
-  <text x="450" y="395" class="text">PKCS#11 Interface</text>
-  
-  <!-- Backend Servers -->
-  <rect x="580" y="420" width="180" height="90" class="azure-component-box"/>
-  <text x="670" y="445" class="title">Backend Servers</text>
-  <text x="670" y="465" class="text">Web Applications</text>
-  <text x="670" y="480" class="text">Azure Container Apps</text>
-  <text x="670" y="495" class="text">Microservices</text>
+  <rect x="575" y="95" width="95" height="35" class="component-box"/>
+  <text x="622" y="110" class="text">TLS Offload</text>
+  <text x="622" y="122" class="text">(PKCS#11)</text>
   
   <!-- User Managed Identity -->
-  <rect x="30" y="500" width="240" height="85" class="azure-component-box"/>
-  <text x="150" y="525" class="title">User Managed Identity</text>
-  <text x="150" y="545" class="text">Assigned to App Gateway</text>
-  <text x="150" y="560" class="text">HSM Authentication</text>
-  <text x="150" y="575" class="text">No Shared Secrets</text>
+  <rect x="520" y="140" width="120" height="35" class="component-box"/>
+  <text x="580" y="155" class="text">User Managed</text>
+  <text x="580" y="167" class="text">Identity</text>
+  
+  <!-- Managed HSM -->
+  <rect x="50" y="320" width="220" height="130" class="azure-component-box"/>
+  <text x="160" y="345" class="title">Azure Managed HSM</text>
+  
+  <!-- Private Keys -->
+  <rect x="65" y="360" width="90" height="50" class="component-box"/>
+  <text x="110" y="380" class="text">Private Keys</text>
+  <text x="110" y="395" class="text">Certificates</text>
+  
+  <!-- Crypto Operations -->
+  <rect x="165" y="360" width="90" height="50" class="component-box"/>
+  <text x="210" y="380" class="text">Crypto</text>
+  <text x="210" y="395" class="text">Operations</text>
+  
+  <!-- Linux VM -->
+  <rect x="380" y="340" width="140" height="90" class="azure-component-box"/>
+  <text x="450" y="365" class="title">Linux VM</text>
+  <text x="450" y="385" class="text">Certificate Generation</text>
+  <text x="450" y="400" class="text">OpenSSL &amp; e_akv.so</text>
+  <text x="450" y="415" class="text">PKCS#11 Interface</text>
+  
+  <!-- Backend Servers -->
+  <rect x="580" y="370" width="180" height="90" class="azure-component-box"/>
+  <text x="670" y="395" class="title">Backend Servers</text>
+  <text x="670" y="415" class="text">Web Applications</text>
+  <text x="670" y="430" class="text">Azure Container Apps</text>
+  <text x="670" y="445" class="text">Microservices</text>
   
   <!-- Connection Arrows -->
   
@@ -117,30 +115,22 @@
   <!-- Internet to App Gateway Arrow -->
   <line x1="370" y1="115" x2="450" y2="115" class="arrow"/>
   
-  <!-- TLS Termination to TLS Offload Arrow -->
-  <line x1="565" y1="112" x2="580" y2="112" class="arrow"/>
+  <!-- App Gateway to Managed HSM (Curved Connection) -->
+  <line x1="520" y1="200" x2="200" y2="320" class="secure-arrow"/>
+  <text x="320" y="240" class="text" fill="#008000">2. Identity Auth &amp;</text>
+  <text x="320" y="255" class="text" fill="#008000">3. Crypto Operations</text>
   
-  <!-- App Gateway to Managed HSM (Direct Connection) -->
-  <line x1="515" y1="170" x2="160" y2="280" class="secure-arrow"/>
-  <text x="337" y="215" class="text" fill="#008000">3. Crypto Ops</text>
-  <text x="337" y="230" class="text" fill="#008000">(PKCS#11 API)</text>
-  
-  <!-- User Managed Identity to Managed HSM Authentication -->
-  <line x1="150" y1="500" x2="160" y2="410" class="secure-arrow"/>
-  <text x="120" y="455" class="text" fill="#008000">2. Identity Auth</text>
-  
-  <!-- App Gateway to Backend (Direct Connection) -->
-  <line x1="580" y1="170" x2="670" y2="420" class="arrow"/>
-  <text x="625" y="295" class="text">4. TLS Re-encryption</text>
-  <text x="625" y="310" class="text">(Standard TLS)</text>
+  <!-- App Gateway to Backend (Vertical Connection) -->
+  <line x1="650" y1="200" x2="650" y2="370" class="arrow"/>
+  <text x="670" y="285" class="text">4. TLS Re-encryption</text>
   
   <!-- Linux VM to Managed HSM (CSR Generation) -->
-  <line x1="380" y1="365" x2="270" y2="365" class="cert-arrow"/>
-  <text x="325" y="385" class="text" fill="#0066cc">CSR Generation</text>
+  <line x1="380" y1="385" x2="270" y2="385" class="cert-arrow"/>
+  <text x="325" y="405" class="text" fill="#0066cc">CSR Generation</text>
   
   <!-- Linux VM to Application Gateway (Supply Public Cert) -->
-  <line x1="450" y1="320" x2="515" y2="170" class="cert-arrow"/>
-  <text x="482" y="245" class="text" fill="#0066cc">Supply Public Cert</text>
+  <line x1="480" y1="340" x2="550" y2="200" class="cert-arrow"/>
+  <text x="490" y="260" class="text" fill="#0066cc">Supply Public Cert</text>
   
   <!-- Legend -->
   <rect x="330" y="480" width="140" height="90" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
