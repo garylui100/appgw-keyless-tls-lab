@@ -83,39 +83,39 @@ Set up the required environment variables for the lab. **Replace all placeholder
 TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken --output tsv)
 
 # Azure subscription and resource group - REPLACE WITH YOUR VALUES
-export SUBSCRIPTION_ID="<your-subscription-id>"
-export RESOURCE_GROUP="<your-resource-group-name>"
-export LOCATION="<your-preferred-location>"
+SUBSCRIPTION_ID="<your-subscription-id>"
+RESOURCE_GROUP="<your-resource-group-name>"
+LOCATION="<your-preferred-location>"
 
 # Application Gateway configuration - REPLACE WITH YOUR VALUES
-export APPGW_NAME="<your-app-gateway-name>"
-export VNET_NAME="<your-vnet-name>"
-export ADDRESS_PREFIX="<your-address-prefix>"
-export APPGW_SUBNET="<your-appgw-subnet-name>"
-export APPGW_SUBNET_PREFIX="<your-appgw-subnet-prefix>"
-export BACKEND_POOL="<your-backend-pool-name>"
-export BACKEND_SUBNET="<your-backend-subnet-name>"
-export BACKEND_SUBNET_PREFIX="<your-backend-subnet-prefix>"
-export HTTPS_SETTING_NAME="<your-https-setting-name>"
-export PROBE_NAME="<your-probe-name>"
-export APPGW_PIP_NAME="<your-public-ip-name>"
+APPGW_NAME="<your-app-gateway-name>"
+VNET_NAME="<your-vnet-name>"
+ADDRESS_PREFIX="<your-address-prefix>"
+APPGW_SUBNET="<your-appgw-subnet-name>"
+APPGW_SUBNET_PREFIX="<your-appgw-subnet-prefix>"
+BACKEND_POOL="<your-backend-pool-name>"
+BACKEND_SUBNET="<your-backend-subnet-name>"
+BACKEND_SUBNET_PREFIX="<your-backend-subnet-prefix>"
+HTTPS_SETTING_NAME="<your-https-setting-name>"
+PROBE_NAME="<your-probe-name>"
+APPGW_PIP_NAME="<your-public-ip-name>"
 
 # Container Apps configuration - REPLACE WITH YOUR VALUES
-export ACA_ENV="<your-container-apps-env-name>"
-export ACA_NAME="<your-container-app-name>"
+ACA_ENV="<your-container-apps-env-name>"
+ACA_NAME="<your-container-app-name>"
 
 # Managed Identity and HSM configuration - REPLACE WITH YOUR VALUES
-export MI_NAME="<your-managed-identity-name>"
-export MHSM_NAME="<your-managed-hsm-name>"
-export SECURITY_DOMAIN="<your-security-domain-file>"
-export PRIVATE_KEY="<your-private-key-name>"
+MI_NAME="<your-managed-identity-name>"
+MHSM_NAME="<your-managed-hsm-name>"
+SECURITY_DOMAIN="<your-security-domain-file>"
+PRIVATE_KEY="<your-private-key-name>"
 
 # Certificate configuration - REPLACE WITH YOUR VALUES
-export SSCERT_PASSWD="<your-certificate-password>"
-export SSCERT_NAME="<your-certificate-name>"
-export SSCERT_FILE="<your-certificate-file>"
-export LISTENER="<your-https-listener-name>"
-export HTTPS_PORT="<your-frontend-port-name>"
+SSCERT_PASSWD="<your-certificate-password>"
+SSCERT_NAME="<your-certificate-name>"
+SSCERT_FILE="<your-certificate-file>"
+LISTENER="<your-https-listener-name>"
+HTTPS_PORT="<your-frontend-port-name>"
 
 echo "Environment variables set successfully!"
 echo "Resource Group: $RESOURCE_GROUP"
