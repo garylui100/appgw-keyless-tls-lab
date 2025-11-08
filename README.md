@@ -120,7 +120,7 @@ HTTPS_PORT="<your-frontend-port-name>"
 
 > **Important**: Replace all placeholder values (enclosed in `< >`) with your own values. Only the `TOKEN` variable should remain as-is since it dynamically retrieves the access token.
 
-#### Example: Configured Environment Variables
+#### Example:
 
 After setting up your environment variables, they should look similar to this example:
 
@@ -196,7 +196,7 @@ az keyvault key list --hsm-name $MHSM_NAME
 Create an Ubuntu VM that will be used for certificate operations and TLS Offload Library configuration:
 
 #### Create Ubuntu VM
-Follow the steps [here](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal?tabs=ubuntu) to create a new virtual machine based on Ubuntu Linux
+Follow the steps [here](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal?tabs=ubuntu) to create a new virtual machine based on Ubuntu Linux.
 
 #### Create a system managed identity
 
@@ -207,9 +207,42 @@ Once created, note the Object (principal) ID for a future step.
 ```bash
 # Set the variable for the System Managed Identity Object ID
 smioid="<System Managed Identity Object ID>"
+
+# Assign "Managed HSM Crypto User" role to the VM's system managed identity for Ubuntu VM's key operations
+az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Crypto User" --assignee-object-id $smioid --assignee-principal-type MSI --scope /keys
 ```
-### 6. Troubleshooting
-- [Common Issues and Solutions](docs/12-troubleshooting.md)
+### 6. Copy e_akv.so Library to the Ubuntu VM
+
+Download and transfer the Azure Managed HSM TLS Offload Library to your Ubuntu VM:
+
+#### Download the TLS Offload Library
+
+1. Download the `e_akv.so` library from the local repository to your local machine:
+   - The library is located at: `libs/e_akv.so`
+   - Download this file to save it to your local machine
+
+#### Transfer the Library to Ubuntu VM
+
+2. Transfer the `e_akv.so` library to your Ubuntu VM's home directory:
+   
+   **Option A: Using SCP (if connecting from Linux/macOS/Windows with WSL):**
+   ```bash
+   scp e_akv.so <username>@<vm-public-ip>:/home/<username>/
+   ```
+   
+   **Option B: Using Azure portal file upload:**
+   - Connect to your VM via SSH through the Azure portal
+   - Use the file upload feature in the Azure portal SSH session
+   - Upload the file to `/home/<username>/` directory
+
+   **Option C: Using wget (if you have the file publicly accessible):**
+   ```bash
+   # SSH into your Ubuntu VM first, then run:
+   cd /home/<username>
+   wget https://github.com/luzhi_microsoft/appgw-mhsm-tls-integration-lab/raw/main/libs/e_akv.so
+   ```
+
+Replace `<username>` with your actual Ubuntu username and `<vm-public-ip>` with your VM's public IP address.
 
 ## Key Benefits
 
