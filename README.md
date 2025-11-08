@@ -116,12 +116,6 @@ SSCERT_NAME="<your-certificate-name>"
 SSCERT_FILE="<your-certificate-file>"
 LISTENER="<your-https-listener-name>"
 HTTPS_PORT="<your-frontend-port-name>"
-
-echo "Environment variables set successfully!"
-echo "Resource Group: $RESOURCE_GROUP"
-echo "Location: $LOCATION"
-echo "Managed HSM: $MHSM_NAME"
-echo "Application Gateway: $APPGW_NAME"
 ```
 
 > **Important**: Replace all placeholder values (enclosed in `< >`) with your own values. Only the `TOKEN` variable should remain as-is since it dynamically retrieves the access token.
