@@ -62,7 +62,7 @@ Before starting this lab, ensure you have:
 
 ### 1. Environment Variables Setup
 
-#### Azure CLI Authentication
+#### 1.1 Azure CLI Authentication
 
 First, open the Cloud Shell in Azure Portal, then authenticate with Azure CLI and select the subscription where you have owner role permissions:
 
@@ -74,7 +74,7 @@ az login
 az account show --output table
 ```
 
-#### Environment Variables
+#### 1.2 Environment Variables
 
 Set up the required environment variables for the lab. **Replace all placeholder values with your own values**:
 
@@ -120,7 +120,7 @@ HTTPS_PORT="<your-frontend-port-name>"
 
 > **Important**: Replace all placeholder values (enclosed in `< >`) with your own values. Only the `TOKEN` variable should remain as-is since it dynamically retrieves the access token.
 
-#### Example:
+#### 1.3 Example
 
 After setting up your environment variables, they should look similar to this example:
 
@@ -195,10 +195,10 @@ az keyvault key list --hsm-name $MHSM_NAME
 
 Create an Ubuntu VM that will be used for certificate operations and TLS Offload Library configuration:
 
-#### Create Ubuntu VM
+#### 5.1 Create Ubuntu VM
 Follow the steps [here](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal?tabs=ubuntu) to create a new virtual machine based on Ubuntu Linux.
 
-#### Create a system managed identity
+#### 5.2 Create a system managed identity
 
 Follow the steps [here](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-configure-managed-identities?pivots=qs-configure-portal-linux-vm#enable-system-assigned-managed-identity-on-an-existing-vm) to enable a system managed identity on your Linux VM.
 
@@ -215,15 +215,15 @@ az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Cry
 
 Download and transfer the Azure Managed HSM TLS Offload Library to your Ubuntu VM:
 
-#### Download the TLS Offload Library
+#### 6.1 Download the TLS Offload Library
 
-1. Download the `e_akv.so` library from the local repository to your local machine:
-   - The library is located at: `libs/e_akv.so`
-   - Download this file to save it to your local machine
+Download the [`e_akv.so`](libs/e_akv.so) library from the repository to your local machine:
+- Click the link above to view the file, then click "Download" or "Raw" to save it locally
+- Alternative: Right-click the link and select "Save link as..." to download directly
 
-#### Transfer the Library to Ubuntu VM
+#### 6.2 Transfer the Library to Ubuntu VM
 
-2. Transfer the `e_akv.so` library to your Ubuntu VM's home directory:
+Transfer the `e_akv.so` library to your Ubuntu VM's home directory:
    
    **Option A: Using SCP (if connecting from Linux/macOS/Windows with WSL):**
    ```bash
@@ -235,14 +235,132 @@ Download and transfer the Azure Managed HSM TLS Offload Library to your Ubuntu V
    - Use the file upload feature in the Azure portal SSH session
    - Upload the file to `/home/<username>/` directory
 
-   **Option C: Using wget (if you have the file publicly accessible):**
+   **Option C: Using wget (direct download on VM):**
    ```bash
    # SSH into your Ubuntu VM first, then run:
    cd /home/<username>
-   wget https://github.com/luzhi_microsoft/appgw-mhsm-tls-integration-lab/raw/main/libs/e_akv.so
+   wget <library-download-url>
    ```
+   > **Note**: Replace `<library-download-url>` with the official library download URL when available. For lab purposes, you can use the GitHub raw URL as an example: `https://github.com/luzhi_microsoft/appgw-mhsm-tls-integration-lab/raw/main/libs/e_akv.so`
 
 Replace `<username>` with your actual Ubuntu username and `<vm-public-ip>` with your VM's public IP address.
+
+### 7. Configuring Ubuntu VM with OpenSSL and TLS Offload Library
+
+Configure the Ubuntu VM with the required dependencies, OpenSSL 3.0.13, and the TLS Offload Library:
+
+#### 7.1 SSH to Ubuntu VM and Configure the Environment
+
+SSH to your Ubuntu VM and navigate to the home directory where you transferred the `e_akv.so` library:
+
+```bash
+# SSH into your Ubuntu VM and navigate to the user directory
+cd /home/<username>
+
+# Set proper permissions for the TLS Offload Library
+chmod 755 /home/azureuser/e_akv.so
+
+# Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Install build dependencies
+sudo apt install build-essential zlib1g-dev -y
+```
+
+#### 7.2 Install OpenSSL 3.0.13
+
+Download, compile, and install OpenSSL 3.0.13:
+
+```bash
+# Navigate to source directory
+cd /usr/local/src
+
+# Download OpenSSL 3.0.13 source code
+sudo wget https://www.openssl.org/source/openssl-3.0.13.tar.gz --no-check-certificate
+
+# Extract the source code
+sudo tar -xvzf openssl-3.0.13.tar.gz
+cd openssl-3.0.13
+
+# Configure OpenSSL build
+sudo ./config --prefix=/opt/openssl-3.0.13 --openssldir=/opt/openssl-3.0.13 shared zlib
+
+# Compile OpenSSL (using all available CPU cores)
+sudo make -j$(nproc)
+
+# Install OpenSSL
+sudo make install
+```
+
+#### 7.3 Configure TLS Offload Library
+
+Install and configure the Azure Managed HSM TLS Offload Library:
+
+```bash
+# Copy the engine binary to OpenSSL engine directory
+sudo cp /home/azureuser/e_akv.so /opt/openssl-3.0.13/lib64/engines-3/
+
+# Verify the hash of the e_akv.so file
+md5sum /opt/openssl-3.0.13/lib64/engines-3/e_akv.so
+
+# Expected output:
+# de1f6553e5da8c3a6a3456c037fa7d1d  /opt/openssl-3.0.13/lib64/engines-3/e_akv.so
+```
+
+#### 7.4 Configure Environment Variables
+
+Set up the required environment variables for OpenSSL and the TLS Offload Library:
+
+```bash
+# Configure environment variables for this session
+export LD_LIBRARY_PATH=/opt/openssl-3.0.13/lib64:$LD_LIBRARY_PATH
+export OPENSSL_ENGINES=/opt/openssl-3.0.13/lib64/engines-3
+export PATH=/opt/openssl-3.0.13/bin:$PATH
+
+# Test the e_akv.so engine is working properly
+openssl engine -t -c -vvvv e_akv
+
+# Expected output:
+# (e_akv) AKV/HSM engine 
+# [RSA, rsaEncryption, RSASSA-PSS, id-ecPublicKey] [ available ]
+
+# Verify OpenSSL version
+openssl version
+
+# Expected output:
+# OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)
+```
+
+#### 7.5 Generate Self-Signed Certificate Using HSM Private Key
+
+Create a self-signed certificate using the private key stored in Azure Managed HSM:
+
+```bash
+# Set certificate configuration
+export OPENSSL_CERT_DAYS=3650
+export OPENSSL_CERT_SUBJ=/CN=contoso.com
+
+# Navigate to a directory where you have write access
+cd /home/<username>
+
+# Set the HSM and private key variables (replace with your actual values)
+MHSM_NAME="<your-mhsm-name>"
+PRIVATE_KEY="<your-private-key-name>"
+
+# Generate self-signed certificate using HSM private key
+openssl req -new -x509 -engine e_akv -keyform engine -key managedHsm:$MHSM_NAME:$PRIVATE_KEY -out cert_rsa.pem -subj $OPENSSL_CERT_SUBJ -days $OPENSSL_CERT_DAYS
+
+# Convert the certificate to base64 format for Application Gateway
+base64 -w0 cert_rsa.pem > base64.txt
+```
+
+> **Important**: 
+> - Replace `<username>` with your actual Ubuntu username
+> - Replace `<your-mhsm-name>` with your actual Managed HSM name
+> - Replace `<your-private-key-name>` with your actual private key name
+> - Ensure you're in a directory where you have write permissions when generating the certificate
+
+The certificate (`cert_rsa.pem`) and its base64-encoded version (`base64.txt`) will be created in your current directory. The base64-encoded certificate can be used for configuring Application Gateway with keyless TLS.
 
 ## Key Benefits
 
