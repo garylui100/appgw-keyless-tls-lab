@@ -158,7 +158,7 @@ To download the archived files, go to Cloud Shell and select "Manage files" to d
 
 ![Security Domain Download](assets/images/download_security_domain.png)
 
-### 3. Create User Managed Identity
+### 3. Create User Managed Identity and Assign RBAC Roles
 
 Create a user-assigned managed identity that will be used for authentication with the Azure Managed HSM:
 
@@ -168,17 +168,35 @@ az identity create --name $MI_NAME --resource-group $RESOURCE_GROUP --location $
 
 # Get the principal ID of the managed identity for role assignments
 mioid=$(az identity show --name $MI_NAME --resource-group $RESOURCE_GROUP --query principalId --output tsv)
+
+# Assign "Managed HSM Crypto User" role to the managed identity for key operations (this will be used for Application Gateway)
+az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Crypto User" --assignee-object-id $mioid --assignee-principal-type MSI --scope /keys
+
+# Assign "Managed HSM Crypto User" role to the managed identity for key operations (this is for Cloud Shell)
+az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Crypto User" --assignee-object-id $oid --assignee-principal-type MSI --scope /keys
+
+# Verify Cloud Shell has access to the Managed HSM keys
+az keyvault key list --hsm-name $MHSM_NAME
 ```
 
-### 4. Application Gateway Configuration
-- [Deploy Application Gateway](docs/06-deploy-application-gateway.md)
-- [Configure TLS Offload Library](docs/07-configure-tls-offload.md)
-- [Set up Keyless TLS](docs/08-setup-keyless-tls.md)
+### 4. Create Managed HSM Private Key
 
-### 5. Testing and Validation
-- [Test TLS Handshake](docs/09-test-tls-handshake.md)
-- [Validate Security Configuration](docs/10-validate-security.md)
-- [Performance Testing](docs/11-performance-testing.md)
+Generate a private key in the Azure Managed HSM that will be used for keyless TLS operations:
+
+```bash
+# Create RSA private key in Managed HSM for TLS operations
+az keyvault key create --hsm-name $MHSM_NAME --name $PRIVATE_KEY --ops wrapKey unwrapKey sign --kty RSA-HSM --size 2048 
+
+# Verify the key has been created and list all keys in the HSM
+az keyvault key list --hsm-name $MHSM_NAME
+```
+
+### 5. Provision Linux VM for Certificate Operations
+
+Create an Ubuntu VM that will be used for certificate operations and TLS Offload Library configuration:
+
+#### Create Ubuntu VM
+Follow the steps [here](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal?tabs=ubuntu) to create a new virtual machine based on Ubuntu Linux
 
 ### 5. Troubleshooting
 - [Common Issues and Solutions](docs/12-troubleshooting.md)
