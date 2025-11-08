@@ -55,7 +55,7 @@ Before starting this lab, ensure you have:
 
 ### Software Requirements
 - Azure CLI or Azure PowerShell
-- OpenSSL for certificate operations
+- OpenSSL-3.0.13 for certificate operations
 - Azure Managed HSM TLS Offload Library (e_akv.so)
 
 ## Lab Sections
@@ -158,9 +158,17 @@ To download the archived files, go to Cloud Shell and select "Manage files" to d
 
 ![Security Domain Download](assets/images/download_security_domain.png)
 
-### 3. Key Management
-- [Generate TLS Keys in Managed HSM](docs/04-generate-tls-keys.md)
-- [Configure Key Labels and Access](docs/05-configure-key-access.md)
+### 3. Create User Managed Identity
+
+Create a user-assigned managed identity that will be used for authentication with the Azure Managed HSM:
+
+```bash
+# Create user-assigned managed identity
+az identity create --name $MI_NAME --resource-group $RESOURCE_GROUP --location $LOCATION
+
+# Get the principal ID of the managed identity for role assignments
+mioid=$(az identity show --name $MI_NAME --resource-group $RESOURCE_GROUP --query principalId --output tsv)
+```
 
 ### 4. Application Gateway Configuration
 - [Deploy Application Gateway](docs/06-deploy-application-gateway.md)
