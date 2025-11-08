@@ -368,6 +368,133 @@ base64 -w0 cert_rsa.pem > base64.txt
 
 The certificate (`cert_rsa.pem`) and its base64-encoded version (`base64.txt`) will be created in your current directory. The base64-encoded certificate can be used for configuring Application Gateway with keyless TLS.
 
+### 8. Deploy Application Gateway and Static App for Testing (Optional)
+
+> **Note**: This section is optional. If you already have an Application Gateway (V2 SKU) and web server configured, you can skip this part and proceed to configure keyless TLS on your existing infrastructure.
+
+Deploy a test environment with Application Gateway V2 and a static web application to demonstrate keyless TLS integration:
+
+#### 8.1 Create Virtual Network and Subnets
+
+Set up the network infrastructure for Application Gateway and backend services:
+
+```bash
+# Create virtual network with Application Gateway subnet
+az network vnet create --name $VNET_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --address-prefix $ADDRESS_PREFIX --subnet-name $APPGW_SUBNET --subnet-prefix $APPGW_SUBNET_PREFIX
+
+# Create backend subnet for services
+az network vnet subnet create --name $BACKEND_SUBNET --resource-group $RESOURCE_GROUP --vnet-name $VNET_NAME --address-prefix $BACKEND_SUBNET_PREFIX
+```
+
+#### 8.2 Deploy Static Web Application
+
+Create a Container Apps environment and deploy a test web application:
+
+```bash
+# Register Microsoft.App resource provider if not already done
+# az provider register --namespace Microsoft.App --wait
+
+# Create Container Apps environment
+az containerapp env create --name $ACA_ENV --resource-group $RESOURCE_GROUP --location $LOCATION --logs-destination none
+
+# Create static web container application
+az containerapp create --name $ACA_NAME --resource-group $RESOURCE_GROUP --environment $ACA_ENV --image nginxdemos/hello --target-port 80 --ingress external
+
+# Get the static app URL for backend configuration
+ACA_URL=$(az containerapp show --name $ACA_NAME --resource-group $RESOURCE_GROUP --query properties.configuration.ingress.fqdn --output tsv)
+
+echo "Container App URL: https://$ACA_URL"
+```
+
+#### 8.3 Create Application Gateway Infrastructure
+
+Set up the Application Gateway with basic configuration:
+
+```bash
+# Create public IP for Application Gateway
+az network public-ip create --resource-group $RESOURCE_GROUP --name $APPGW_PIP_NAME --sku Standard
+
+# Create self-signed certificates for Application Gateway (temporary)
+openssl req -x509 -newkey rsa:2048 -keyout mykey.key -out mycert.crt -days 365 -nodes -subj "/C=US/ST=WA/L=Redmond/O=MyCompany/CN=myapp.example.com"
+
+openssl pkcs12 -export -out $SSCERT_FILE -inkey mykey.key -in mycert.crt -passout pass:$SSCERT_PASSWD
+
+# Create Application Gateway (basic skeleton)
+az network application-gateway create --name $APPGW_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --sku Standard_v2 --capacity 2 --public-ip-address $APPGW_PIP_NAME --vnet-name $VNET_NAME --subnet $APPGW_SUBNET --priority 100
+```
+
+#### 8.4 Configure SSL Certificate and HTTPS Settings
+
+Upload SSL certificate and configure HTTPS components:
+
+```bash
+# Upload SSL certificate
+az network application-gateway ssl-cert create --resource-group $RESOURCE_GROUP --gateway-name $APPGW_NAME --name $SSCERT_NAME --cert-file $SSCERT_FILE --cert-password $SSCERT_PASSWD
+
+# Create frontend port for HTTPS
+az network application-gateway frontend-port create --resource-group $RESOURCE_GROUP --gateway-name $APPGW_NAME --name $HTTPS_PORT --port 443
+
+# Create HTTPS listener
+az network application-gateway http-listener create --resource-group $RESOURCE_GROUP --gateway-name $APPGW_NAME --name $LISTENER --frontend-ip "appGatewayFrontendIP" --frontend-port $HTTPS_PORT --ssl-cert $SSCERT_NAME
+```
+
+#### 8.5 Configure Backend Pool and Health Probes
+
+Set up backend services and health monitoring:
+
+```bash
+# Create backend pool with Container App
+az network application-gateway address-pool create --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --name $BACKEND_POOL --servers $ACA_URL
+
+# Create HTTPS backend settings
+az network application-gateway http-settings create --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --name $HTTPS_SETTING_NAME --port 443 --protocol Https --cookie-based-affinity Disabled --host-name-from-backend-pool true
+
+# Create HTTPS health probe
+az network application-gateway probe create --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --name $PROBE_NAME --protocol Https --path "/" --interval 30 --timeout 30 --host-name-from-http-settings true
+
+# Update HTTPS settings to use the health probe
+az network application-gateway http-settings update --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --name $HTTPS_SETTING_NAME --probe $PROBE_NAME --port 443 --protocol Https --host-name-from-backend-pool true
+```
+
+#### 8.6 Configure Routing Rules
+
+Set up routing from frontend listener to backend pool:
+
+```bash
+# Get the default rule name
+RULE_NAME=$(az network application-gateway rule list --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --query "[0].name" --output tsv)
+
+# Update the rule to route HTTPS traffic to backend pool
+az network application-gateway rule update --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --name $RULE_NAME --http-listener $LISTENER --http-settings $HTTPS_SETTING_NAME --address-pool $BACKEND_POOL --priority 100
+```
+
+#### 8.7 Test the Deployment
+
+Verify that both the Container App and Application Gateway are working correctly:
+
+```bash
+# Get Application Gateway public IP
+APPGW_PUBLIC_IP=$(az network public-ip show --resource-group $RESOURCE_GROUP --name $APPGW_PIP_NAME --query ipAddress --output tsv)
+
+echo "=== Test URLs ==="
+echo "Container App Direct Access: https://$ACA_URL"
+echo "Application Gateway Frontend: https://$APPGW_PUBLIC_IP"
+echo ""
+echo "=== Testing Instructions ==="
+echo "1. Test Container App: Open https://$ACA_URL in your browser"
+echo "2. Test Application Gateway: Open https://$APPGW_PUBLIC_IP in your browser"
+echo "3. You will receive SSL certificate warnings because the certificates are self-signed - this is expected"
+echo "4. Accept the certificate warnings to verify the applications are working"
+```
+
+> **Important Testing Notes**:
+> - **Container App**: Should display a simple "Hello World" page from the nginxdemos/hello container
+> - **Application Gateway**: Should proxy to the same content through the Application Gateway
+> - **SSL Warnings**: Both endpoints will show SSL certificate warnings because they use self-signed certificates - this is expected and safe for testing
+> - **Next Steps**: After confirming both endpoints work, you can proceed to configure keyless TLS using the HSM private key generated in Lab 7
+
+This test environment provides a foundation for implementing keyless TLS where the Application Gateway will use the private key stored in Azure Managed HSM instead of the local self-signed certificate.
+
 ## Key Benefits
 
 ### Security Advantages
