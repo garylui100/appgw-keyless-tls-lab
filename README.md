@@ -134,10 +134,35 @@ After setting up your environment variables, they should look similar to this ex
 
 > **Note**: This screenshot shows an example configuration with actual values. Your actual values will be different based on your specific setup and naming preferences.
 
-### 2. Infrastructure Deployment
-- [Deploy Azure Managed HSM](docs/01-deploy-managed-hsm.md)
-- [Configure Service Principals](docs/02-configure-service-principals.md)
-- [Set up Role Assignments](docs/03-setup-role-assignments.md)
+### 2. Provision and configure Managed HSM
+
+Create the Azure resource group and provision a Managed HSM with security domain:
+
+```bash
+# Create resource group
+az group create --name $RESOURCE_GROUP --location $LOCATION
+
+# Get the current user's object ID for HSM administrator
+oid=$(az ad signed-in-user show --query id -o tsv)
+
+# Create the Managed HSM with the current user as administrator
+az keyvault create --hsm-name $MHSM_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --administrators $oid --retention-days 7
+
+# Generate three security domain certificates for HSM initialization
+openssl req -newkey rsa:2048 -nodes -keyout cert_0.key -x509 -days 3650 -out cert_0.cer -subj "/C=US/ST=WA/L=Redmond/O=MyCompany/CN=myapp.example.com"
+openssl req -newkey rsa:2048 -nodes -keyout cert_1.key -x509 -days 3650 -out cert_1.cer -subj "/C=US/ST=WA/L=Redmond/O=MyCompany/CN=myapp.example.com"
+openssl req -newkey rsa:2048 -nodes -keyout cert_2.key -x509 -days 3650 -out cert_2.cer -subj "/C=US/ST=WA/L=Redmond/O=MyCompany/CN=myapp.example.com"
+
+# Download and initialize the security domain for the HSM
+az keyvault security-domain download --hsm-name $MHSM_NAME --sd-wrapping-keys ./cert_0.cer ./cert_1.cer ./cert_2.cer --sd-quorum 2 --security-domain-file $SECURITY_DOMAIN
+
+# Archive all generated files for backup and portability
+tar -czvf mhsm.tar.gz ./*
+```
+
+To download the archived files, go to Cloud Shell and select "Manage files" to download the `mhsm.tar.gz` file:
+
+![Security Domain Download](assets/images/download_security_domain.png)
 
 ### 3. Key Management
 - [Generate TLS Keys in Managed HSM](docs/04-generate-tls-keys.md)
