@@ -290,6 +290,12 @@ sudo make -j$(nproc)
 
 # Install OpenSSL
 sudo make install
+
+# Verify OpenSSL version
+openssl version
+
+# Expected output:
+# OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)
 ```
 
 #### 7.3 Configure TLS Offload Library
