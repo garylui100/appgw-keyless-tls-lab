@@ -198,7 +198,17 @@ Create an Ubuntu VM that will be used for certificate operations and TLS Offload
 #### Create Ubuntu VM
 Follow the steps [here](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal?tabs=ubuntu) to create a new virtual machine based on Ubuntu Linux
 
-### 5. Troubleshooting
+#### Create a system managed identity
+
+Follow the steps [here](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-configure-managed-identities?pivots=qs-configure-portal-linux-vm#enable-system-assigned-managed-identity-on-an-existing-vm) to enable a system managed identity on your Linux VM.
+
+Once created, note the Object (principal) ID for a future step.
+
+```bash
+# Set the variable for the System Managed Identity Object ID
+smioid="<System Managed Identity Object ID>"
+```
+### 6. Troubleshooting
 - [Common Issues and Solutions](docs/12-troubleshooting.md)
 
 ## Key Benefits
