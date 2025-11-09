@@ -80,47 +80,45 @@ Set up the required environment variables for the lab. **Replace all placeholder
 
 ```bash
 # Access token for Azure Management API (keep this as-is)
-TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken --output tsv)
+export TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken --output tsv)
 
 # Azure subscription and resource group - REPLACE WITH YOUR VALUES
-SUBSCRIPTION_ID="<your-subscription-id>"
-RESOURCE_GROUP="<your-resource-group-name>"
-LOCATION="<your-preferred-location>"
+export SUBSCRIPTION_ID="<your-subscription-id>"
+export RESOURCE_GROUP="<your-resource-group-name>"
+export LOCATION="<your-preferred-location>"
 
 # Application Gateway configuration - REPLACE WITH YOUR VALUES
-APPGW_NAME="<your-app-gateway-name>"
-VNET_NAME="<your-vnet-name>"
-ADDRESS_PREFIX="<your-address-prefix>"
-APPGW_SUBNET="<your-appgw-subnet-name>"
-APPGW_SUBNET_PREFIX="<your-appgw-subnet-prefix>"
-BACKEND_POOL="<your-backend-pool-name>"
-BACKEND_SUBNET="<your-backend-subnet-name>"
-BACKEND_SUBNET_PREFIX="<your-backend-subnet-prefix>"
-HTTPS_SETTING_NAME="<your-https-setting-name>"
-PROBE_NAME="<your-probe-name>"
-APPGW_PIP_NAME="<your-public-ip-name>"
+export APPGW_NAME="<your-app-gateway-name>"
+export VNET_NAME="<your-vnet-name>"
+export ADDRESS_PREFIX="<your-address-prefix>"
+export APPGW_SUBNET="<your-appgw-subnet-name>"
+export APPGW_SUBNET_PREFIX="<your-appgw-subnet-prefix>"
+export BACKEND_POOL="<your-backend-pool-name>"
+export BACKEND_SUBNET="<your-backend-subnet-name>"
+export BACKEND_SUBNET_PREFIX="<your-backend-subnet-prefix>"
+export HTTPS_SETTING_NAME="<your-https-setting-name>"
+export PROBE_NAME="<your-probe-name>"
+export APPGW_PIP_NAME="<your-public-ip-name>"
 
 # Container Apps configuration - REPLACE WITH YOUR VALUES
-ACA_ENV="<your-container-apps-env-name>"
-ACA_NAME="<your-container-app-name>"
+export ACA_ENV="<your-container-apps-env-name>"
+export ACA_NAME="<your-container-app-name>"
 
 # Managed Identity and HSM configuration - REPLACE WITH YOUR VALUES
-MI_NAME="<your-managed-identity-name>"
-MHSM_NAME="<your-managed-hsm-name>"
-SECURITY_DOMAIN="<your-security-domain-file>"
-PRIVATE_KEY="<your-private-key-name>"
+export MI_NAME="<your-managed-identity-name>"
+export MHSM_NAME="<your-managed-hsm-name>"
+export SECURITY_DOMAIN="<your-security-domain-file>"
+export PRIVATE_KEY="<your-private-key-name>"
 
 # Certificate configuration - REPLACE WITH YOUR VALUES
-SSCERT_PASSWD="<your-certificate-password>"
-SSCERT_NAME="<your-certificate-name>"
-SSCERT_FILE="<your-certificate-file>"
-LISTENER="<your-https-listener-name>"
-HTTPS_PORT="<your-frontend-port-name>"
+export SSCERT_PASSWD="<your-certificate-password>"
+export SSCERT_NAME="<your-certificate-name>"
+export SSCERT_FILE="<your-certificate-file>"
+export LISTENER="<your-https-listener-name>"
+export HTTPS_PORT="<your-frontend-port-name>"
 ```
 
 > **Important**: Replace all placeholder values (enclosed in `< >`) with your own values. Only the `TOKEN` variable should remain as-is since it dynamically retrieves the access token.
-
-#### 1.3 Example
 
 After setting up your environment variables, they should look similar to this example:
 
@@ -137,7 +135,7 @@ Create the Azure resource group and provision a Managed HSM with security domain
 az group create --name $RESOURCE_GROUP --location $LOCATION
 
 # Get the current user's object ID for HSM administrator
-oid=$(az ad signed-in-user show --query id -o tsv)
+export oid=$(az ad signed-in-user show --query id -o tsv)
 
 # Create the Managed HSM with the current user as administrator
 az keyvault create --hsm-name $MHSM_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --administrators $oid --retention-days 7
@@ -167,7 +165,7 @@ Create a user-assigned managed identity that will be used for authentication wit
 az identity create --name $MI_NAME --resource-group $RESOURCE_GROUP --location $LOCATION
 
 # Get the principal ID of the managed identity for role assignments
-mioid=$(az identity show --name $MI_NAME --resource-group $RESOURCE_GROUP --query principalId --output tsv)
+export mioid=$(az identity show --name $MI_NAME --resource-group $RESOURCE_GROUP --query principalId --output tsv)
 
 # Assign "Managed HSM Crypto User" role to the managed identity for key operations (this will be used for Application Gateway)
 az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Crypto User" --assignee-object-id $mioid --assignee-principal-type MSI --scope /keys
@@ -206,7 +204,7 @@ Once created, note the Object (principal) ID for a future step.
 
 ```bash
 # Set the variable for the System Managed Identity Object ID
-smioid="<System Managed Identity Object ID>"
+export smioid="<System Managed Identity Object ID>"
 
 # Assign "Managed HSM Crypto User" role to the VM's system managed identity for Ubuntu VM's key operations
 az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Crypto User" --assignee-object-id $smioid --assignee-principal-type MSI --scope /keys
@@ -491,7 +489,7 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 > - **Container App**: Should display a simple "Hello World" page from the nginxdemos/hello container
 > - **Application Gateway**: Should proxy to the same content through the Application Gateway
 > - **SSL Warnings**: Both endpoints will show SSL certificate warnings because they use self-signed certificates - this is expected and safe for testing
-> - **Next Steps**: After confirming both endpoints work, you can proceed to configure keyless TLS using the HSM private key generated in Lab 7
+> - **Next Steps**: After confirming both endpoints work, you can proceed to configure keyless TLS using the HSM private key generated in Lab 9
 
 This test environment provides a foundation for implementing keyless TLS where the Application Gateway will use the private key stored in Azure Managed HSM instead of the local self-signed certificate.
 
@@ -623,4 +621,3 @@ For questions and support:
 - Create an issue in this repository
 - Check the [troubleshooting guide](docs/12-troubleshooting.md)
 - Review Azure documentation links above
-A hands-on lab demonstrating the integration process for Keyless TLS with Application Gateway and Managed HSM.
