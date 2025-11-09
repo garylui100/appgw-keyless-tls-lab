@@ -493,6 +493,135 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 
 This test environment provides a foundation for implementing keyless TLS where the Application Gateway will use the private key stored in Azure Managed HSM instead of the local self-signed certificate.
 
+### 9. Configure Keyless TLS on Application Gateway
+
+Configure Application Gateway to use keyless TLS with the private key stored in Azure Managed HSM:
+
+#### 9.1 Associate User Managed Identity to Application Gateway
+
+Assign the user-assigned managed identity to Application Gateway to enable authentication with Azure Managed HSM:
+
+```bash
+# Get the resource ID of the managed identity
+export identityId=$(az identity show --name $MI_NAME --resource-group $RESOURCE_GROUP --query id -o tsv)
+
+# Update Application Gateway to use the user-assigned identity
+az network application-gateway update --name $APPGW_NAME --resource-group $RESOURCE_GROUP --set identity='{"type":"UserAssigned","userAssignedIdentities":{"'"$identityId"'":{}}}'
+
+# Verify the identity has been associated
+az network application-gateway show --name $APPGW_NAME --resource-group $RESOURCE_GROUP --query identity
+```
+
+The output should show the user-assigned managed identity associated with your Application Gateway.
+
+#### 9.2 Export Application Gateway ARM Template
+
+Export the Application Gateway configuration template for keyless TLS configuration:
+
+- Navigate to your Application Gateway in the Azure Portal
+- Go to the **Automation** blade in the left menu
+- Click on **Export template**
+- Click **Download** to save the ARM template to your local machine
+
+![Download ARM Template](assets/images/Download%20Template.png)
+
+> **Note**: The exported template will be used to configure keyless TLS parameters. Save the template file to a location where you can easily access and modify it.
+
+#### 9.3 Configure Keyless TLS in ARM Template
+
+After downloading the ARM template, you'll need to modify it to enable keyless TLS:
+
+- Extract the downloaded template ZIP file
+- Open the `template.json` file in your preferred editor (preferrably Visual Studio Code)
+- Locate the SSL certificate configuration section in the `sslCertificates` array
+  - **Rename the SSL certificate**: Change the certificate name to a new value (e.g., append `-v2` or increment version number). The Azure Resource Manager REST API uses incremental updates and requires a name change to recognize and apply certificate modifications.
+  - **Update certificate data**: Copy the base64-encoded public certificate data from the `base64.txt` file generated in Lab 7.5 and paste it into the `publicCertData` field. Configure the `sslCertificates` section with the following JSON structure:
+
+```json
+"sslCertificates": [
+    {
+        "name": "mHSM-Key001",
+        "properties": {
+            "hsm": {
+                "keyId": "https://<HSM NAME (in this example ContosoMHSM)>.managedhsm.azure.net/keys/<key-name (in this example: key001)>",
+                "publicCertData": "Q......................=="
+            },
+            "httpListeners": [
+                {
+                    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/httpListeners/https-mhsm-listener1"
+                },
+                {
+                    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/httpListeners/https-mhsm-listener2"
+                }
+            ]
+        },
+        "type": "Microsoft.Network/applicationGateways/sslCertificates"
+    }
+],
+```
+
+![Update SSL Certificates](assets/images/Update_sslCertificates.png)
+
+- **Reference the certificate via your HTTPS listener**: Update the `httpListeners` section to reference the HSM-backed SSL certificate. Configure the listener using the following JSON structure:
+
+```json
+"httpListeners": [
+    {
+        "name": "HTTPS-MHSM-Listener",
+        "properties": {
+            "frontendIPConfiguration": {
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/frontendIPConfigurations/PublicIP-FE"
+            },
+            "frontendPort": {
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/frontendPorts/port_443"
+            },
+            "sslCertificate": {
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/sslCertificates/mHSM-Key001"
+            },
+            "protocol": "Https",
+            "hostNames": [],
+            "requireServerNameIndication": false,
+            "requestRoutingRules": [
+                {
+                    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/requestRoutingRules/HTTPS-MHSM-Rule"
+                }
+            ]
+        },
+        "type": "Microsoft.Network/applicationGateways/httpListeners"
+    }
+],
+```
+
+![Update HTTPS Listener](assets/images/Update_Listener.png)
+
+> **Important**: Ensure the `sslCertificate.id` references the certificate name you configured in the `sslCertificates` section (e.g., `mHSM-Key001`). The listener configuration establishes the connection between your HTTPS endpoint and the HSM-backed certificate.
+
+#### 9.4 Redeploy Application Gateway with Updated ARM Template
+
+After modifying the ARM template to enable keyless TLS, redeploy the Application Gateway configuration:
+
+- **Upload template files to Azure Cloud Shell**: Transfer the modified `template.json` and `parameters.json` files to Azure Cloud Shell using one of the following methods:
+  - **Option A**: Open the files locally, copy their contents, create new files in Cloud Shell, and paste the content
+  - **Option B**: Use Cloud Shell's **Manage files** feature (upload icon in the toolbar) to upload the files directly
+
+- **Validate the template**: Before deploying, validate the JSON syntax and configuration to catch any errors introduced during modification:
+
+```bash
+# Validate the ARM template and parameters
+az deployment group validate --resource-group $RESOURCE_GROUP --template-file ./template.json --parameters @./parameters.json --debug
+```
+
+Review the validation output carefully. If any errors or syntax issues are reported, return to your template files and fix them before proceeding.
+
+- **Deploy the updated configuration**: Once validation succeeds and everything looks correct, deploy the updated Application Gateway configuration:
+
+```bash
+# Deploy the ARM template to update Application Gateway with keyless TLS
+az deployment group create --resource-group $RESOURCE_GROUP --template-file ./template.json --parameters @./parameters.json
+```
+
+> **Note**: The deployment process may take several minutes to complete. Monitor the deployment progress in the Azure Portal or wait for the CLI command to finish. Once complete, your Application Gateway will be configured with keyless TLS using the private key stored in Azure Managed HSM.
+
 ## Key Benefits
 
 ### Security Advantages
