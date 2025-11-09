@@ -622,6 +622,12 @@ az deployment group create --resource-group $RESOURCE_GROUP --template-file ./te
 
 > **Note**: The deployment process may take several minutes to complete. Monitor the deployment progress in the Azure Portal or wait for the CLI command to finish. Once complete, your Application Gateway will be configured with keyless TLS using the private key stored in Azure Managed HSM.
 
+- **Verify successful deployment**: After deployment completes, you can verify the keyless TLS configuration by viewing the Application Gateway JSON in the Azure Portal. The new SSL certificate name should appear in the configuration, confirming that the HSM-backed certificate has been successfully applied.
+
+![Successful Deployment Verification](assets/images/Updated_AppGW_Success.png)
+
+> **Tip**: To view the Application Gateway JSON configuration in the portal, navigate to your Application Gateway resource, go to the **JSON View** option (usually found in the Overview or Properties section), and look for the `sslCertificates` array to confirm your new certificate name appears.
+
 ## Key Benefits
 
 ### Security Advantages
