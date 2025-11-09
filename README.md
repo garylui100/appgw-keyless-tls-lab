@@ -491,7 +491,7 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 > - **SSL Warnings**: Both endpoints will show SSL certificate warnings because they use self-signed certificates - this is expected and safe for testing
 > - **Next Steps**: After confirming both endpoints work, you can proceed to configure keyless TLS using the HSM private key generated in Lab 9
 
-> [!WARNING]
+> [!CAUTION]
 > **Understanding Current TLS Configuration**
 > 
 > At this stage, the Application Gateway is **NOT** configured with keyless TLS. The `.pfx` certificate file created in section 8.3 contains both the public certificate and the private key. This means the private key is stored locally on the Application Gateway, which is the traditional TLS termination approach. 
