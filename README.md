@@ -628,6 +628,118 @@ az deployment group create --resource-group $RESOURCE_GROUP --template-file ./te
 
 > **Tip**: To view the Application Gateway JSON configuration in the portal, navigate to your Application Gateway resource, go to the **JSON View** option (usually found in the Overview or Properties section), and look for the `sslCertificates` array to confirm your new certificate name appears.
 
+### 10. Enable Managed HSM Diagnostics and Monitor Keyless TLS Operations (Optional)
+
+> **Note**: This section is optional but highly recommended for production environments. Enabling diagnostics allows you to monitor and audit all cryptographic operations performed by Application Gateway against your Managed HSM, providing visibility into keyless TLS activity and helping with compliance requirements.
+
+Configure diagnostic logging for Azure Managed HSM to monitor and audit keyless TLS cryptographic operations:
+
+#### 10.1 Enable Managed HSM Diagnostic Settings
+
+Set up diagnostic logging to capture HSM operations in a Log Analytics workspace:
+
+- Navigate to your **Managed HSM** resource in the Azure Portal
+- In the left menu, under **Monitoring**, select **Diagnostic settings**
+- Click **+ Add diagnostic setting** to create a new configuration
+- Configure the diagnostic setting with the following parameters:
+  - **Diagnostic setting name**: Enter a descriptive name (e.g., `mhsm-diagnostics`)
+  - **Logs**: Select **AuditEvent** to capture all HSM cryptographic operations
+  - **Destination details**: Check **Send to Log Analytics workspace**
+  - **Subscription**: Select your Azure subscription
+  - **Log Analytics workspace**: Choose an existing workspace or create a new one
+- Click **Save** to apply the diagnostic settings
+
+![Managed HSM Diagnostic Settings Configuration](assets/images/LAW_Diagnostic_Setting.png)
+
+> **Important**: After enabling diagnostics, it may take 5-10 minutes for logs to start appearing in the Log Analytics workspace. The AuditEvent log category captures all cryptographic operations including key usage, authentication events, and access attempts.
+
+#### 10.2 Generate Traffic to Application Gateway
+
+Generate HTTPS traffic to your Application Gateway to trigger keyless TLS operations that will be logged in the Managed HSM:
+
+```bash
+# Get Application Gateway public IP
+APPGW_PUBLIC_IP=$(az network public-ip show --resource-group $RESOURCE_GROUP --name $APPGW_PIP_NAME --query ipAddress --output tsv)
+
+# Generate multiple HTTPS requests to trigger TLS handshakes
+echo "Generating traffic to Application Gateway..."
+for i in {1..10}; do
+  curl -k https://$APPGW_PUBLIC_IP
+  echo "Request $i completed"
+  sleep 2
+done
+
+echo "Traffic generation completed. Wait 5-10 minutes for logs to appear in Log Analytics."
+```
+
+> **Note**: Each HTTPS request initiates a TLS handshake where Application Gateway uses the private key stored in Managed HSM to perform cryptographic signing operations. The `-k` flag bypasses certificate validation since we're using a self-signed certificate for testing.
+
+#### 10.3 Query Managed HSM Logs for Keyless TLS Operations
+
+After generating traffic and waiting for logs to propagate, query the Log Analytics workspace to view HSM operations:
+
+- Navigate to your **Managed HSM** resource in the Azure Portal
+- In the left menu, under **Monitoring**, select **Logs**
+- Close the **Queries** dialog if it appears
+- In the query editor, enter the following KQL (Kusto Query Language) query:
+
+```kql
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT"
+| where Category == "AuditEvent"
+| where OperationName == "KeySign"
+| project TimeGenerated, OperationName, CallerIPAddress, identity_claim_appid_g, properties_s
+| order by TimeGenerated desc
+```
+
+- Click **Run** to execute the query
+- Review the results showing **KeySign** operations performed by Application Gateway
+
+![Managed HSM Log Query Results](assets/images/mhsm_log.png)
+
+> **Understanding KeySign Operations**: When Application Gateway performs keyless TLS termination, it uses the HSM private key to execute **KeySign** operations during the TLS handshake process. Specifically:
+>
+> - **Why KeySign?**: During the TLS handshake, the server (Application Gateway) must digitally sign a message to prove it possesses the private key corresponding to the certificate's public key. This signature operation is performed using the HSM private key.
+> - **Why Not WrapKey/UnwrapKey?**: WrapKey and UnwrapKey operations are used for key encryption/decryption scenarios (e.g., encrypting data encryption keys). In TLS handshakes, the server needs to **sign** data (not encrypt/decrypt keys), which is why you see KeySign operations.
+> - **TLS Handshake Flow**: During the TLS handshake, the Application Gateway receives a challenge from the client, uses the HSM to sign this challenge with the private key (KeySign operation), and sends the signature back to the client to complete authentication.
+
+#### 10.4 Additional Monitoring and Analysis
+
+Enhance your monitoring capabilities with additional queries and insights:
+
+**Query all HSM operations in the last hour:**
+```kql
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT"
+| where TimeGenerated > ago(1h)
+| summarize Count=count() by OperationName, ResultType
+| order by Count desc
+```
+
+**Monitor failed authentication attempts:**
+```kql
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT"
+| where ResultType != "Success"
+| project TimeGenerated, OperationName, ResultType, CallerIPAddress, properties_s
+| order by TimeGenerated desc
+```
+
+**Track KeySign operations over time:**
+```kql
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT"
+| where OperationName == "KeySign"
+| summarize Count=count() by bin(TimeGenerated, 5m)
+| render timechart
+```
+
+> **Best Practices**:
+> - **Set up alerts**: Configure Azure Monitor alerts for failed HSM operations or unusual access patterns
+> - **Regular audits**: Review HSM logs regularly to ensure only authorized applications (Application Gateway) are performing cryptographic operations
+> - **Retention policies**: Configure appropriate log retention periods based on your compliance requirements
+> - **Performance monitoring**: Use the time-series queries to identify peak usage patterns and optimize your Application Gateway capacity
+
 ## Key Benefits
 
 ### Security Advantages
