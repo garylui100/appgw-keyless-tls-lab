@@ -540,15 +540,15 @@ After downloading the ARM template, you'll need to modify it to enable keyless T
 ```json
 "sslCertificates": [
     {
-        "name": "mHSM-Key001",
+        "name": "mySSCert",
         "properties": {
             "hsm": {
-                "keyId": "https://<HSM NAME (in this example ContosoMHSM)>.managedhsm.azure.net/keys/<key-name (in this example: key001)>",
+                "keyId": "https://<HSM NAME (in this example zlumhsm1)>.managedhsm.azure.net/keys/<key-name (in this example: key001)>",
                 "publicCertData": "Q......................=="
             },
             "httpListeners": [
                 {
-                    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/httpListeners/https-mhsm-listener1"
+                    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/httpListeners/myHTTPSListener"
                 },
                 {
                     "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/httpListeners/https-mhsm-listener2"
@@ -567,7 +567,7 @@ After downloading the ARM template, you'll need to modify it to enable keyless T
 ```json
 "httpListeners": [
     {
-        "name": "HTTPS-MHSM-Listener",
+        "name": "myHTTPSListener",
         "properties": {
             "frontendIPConfiguration": {
                 "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/frontendIPConfigurations/PublicIP-FE"
@@ -576,7 +576,7 @@ After downloading the ARM template, you'll need to modify it to enable keyless T
                 "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/frontendPorts/port_443"
             },
             "sslCertificate": {
-                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/sslCertificates/mHSM-Key001"
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/mhsm-appgw-rg/providers/Microsoft.Network/applicationGateways/mhsm-appgw/sslCertificates/mySSCert"
             },
             "protocol": "Https",
             "hostNames": [],
