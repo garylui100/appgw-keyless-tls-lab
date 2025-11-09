@@ -697,11 +697,11 @@ AzureDiagnostics
 
 ![Managed HSM Log Query Results](assets/images/mhsm_log.png)
 
-> **Understanding KeySign Operations**: When Application Gateway performs keyless TLS termination, it uses the HSM private key to execute **KeySign** operations during the TLS handshake process. Specifically:
+> **Understanding KeySign Operations**: When Application Gateway performs keyless TLS termination, it uses the mHSM private key to execute **KeySign** operations during the TLS handshake process. Specifically:
 >
 > - **Why KeySign?**: During the TLS handshake, the server (Application Gateway) must digitally sign a message to prove it possesses the private key corresponding to the certificate's public key. This signature operation is performed using the HSM private key.
 > - **Why Not WrapKey/UnwrapKey?**: WrapKey and UnwrapKey operations are used for key encryption/decryption scenarios (e.g., encrypting data encryption keys). In TLS handshakes, the server needs to **sign** data (not encrypt/decrypt keys), which is why you see KeySign operations.
-> - **TLS Handshake Flow**: During the TLS handshake, the Application Gateway receives a challenge from the client, uses the HSM to sign this challenge with the private key (KeySign operation), and sends the signature back to the client to complete authentication.
+> - **TLS Handshake Flow**: During the TLS handshake, the Application Gateway receives a challenge from the client, uses the mHSM to sign this challenge with the private key (KeySign operation), and sends the signature back to the client to complete authentication.
 
 #### 10.4 Additional Monitoring and Analysis
 
@@ -740,131 +740,31 @@ AzureDiagnostics
 > - **Retention policies**: Configure appropriate log retention periods based on your compliance requirements
 > - **Performance monitoring**: Use the time-series queries to identify peak usage patterns and optimize your Application Gateway capacity
 
-## Key Benefits
+## Additional Resources
 
-### Security Advantages
-- **Private Key Protection**: Keys never leave the HSM boundary
-- **Hardware Security**: FIPS 140-2 Level 3 validated security
-- **Audit Trail**: Complete logging of cryptographic operations
-- **Access Controls**: Granular role-based access to keys
+For more information about Azure Managed HSM and Application Gateway keyless TLS integration:
 
-### Operational Benefits
-- **Centralized Management**: Single point for key lifecycle management
-- **High Availability**: Built-in redundancy and failover
-- **Scalability**: Supports high-throughput cryptographic operations
-- **Compliance**: Meets regulatory requirements for key protection
-
-## Implementation Approaches
-
-### Simple Approach (Recommended for Testing)
-1. Create service principal for TLS Offload Library
-2. Assign "Managed HSM Crypto User" role at `/keys` scope
-3. Generate keys with required labels
-4. Configure Application Gateway with TLS Offload Library
-5. Set up key labels and service principal credentials
-
-### Granular Approach (Production Recommended)
-1. Create separate admin user with "Managed HSM Crypto Officer" role
-2. Create dedicated service principals for key generation and TLS operations
-3. Create custom role definitions for fine-grained access
-4. Implement per-key access controls
-5. Configure monitoring and alerting
-
-## Configuration Files
-
-### TLS Offload Library Configuration
-```json
-{
-    "ConnectionCache": {
-        "Disable": false,
-        "MaxConnections": 20
-    },
-    "ManagedHsm": {
-        "VaultUri": "https://your-hsm.managedhsm.azure.net/",
-        "ClientId": "your-client-id",
-        "ClientSecret": "your-client-secret"
-    }
-}
-```
-
-### Application Gateway SSL Configuration
-Key configuration elements for enabling keyless TLS:
-- PKCS#11 library path configuration
-- Key label references
-- Service principal authentication
-- Connection caching settings
-
-## Security Considerations
-
-### Access Control
-- Use principle of least privilege
-- Implement custom role definitions
-- Enable per-key access controls
-- Regular access reviews
-
-### Monitoring and Auditing
-- Enable diagnostic logging
-- Monitor HSM operations
-- Set up security alerts
-- Regular security assessments
-
-### Network Security
-- Use private endpoints where possible
-- Implement network segmentation
-- Configure appropriate firewall rules
-- Enable Azure DDoS protection
-
-## Performance Optimization
-
-### Connection Caching
-- Configure appropriate MaxConnections limit
-- Match concurrent signing requests
-- Monitor connection pool utilization
-- Optimize for your workload pattern
-
-### Key Management
-- Use appropriate key sizes
-- Implement key rotation policies
-- Monitor key usage patterns
-- Plan for capacity requirements
-
-## Troubleshooting Guide
-
-### Common Issues
-- **Authentication Errors**: Verify service principal credentials
-- **Key Not Found**: Check key labels and access permissions
-- **Connection Timeouts**: Review network configuration and firewall rules
-- **Performance Issues**: Optimize connection cache settings
-
-### Diagnostic Tools
-- Azure Monitor logs
-- Application Gateway diagnostics
-- Managed HSM audit logs
-- PKCS#11 library debugging
-
-## Resources and References
-
-### Official Documentation
+- [Azure Managed HSM Documentation](https://learn.microsoft.com/azure/key-vault/managed-hsm/)
+- [Application Gateway TLS Overview](https://learn.microsoft.com/azure/application-gateway/ssl-overview)
 - [Azure Managed HSM TLS Offload Library](https://learn.microsoft.com/azure/key-vault/managed-hsm/tls-offload-library)
-- [Application Gateway TLS Configuration](https://learn.microsoft.com/azure/application-gateway/ssl-overview)
-- [PKCS#11 Standard](https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/pkcs11-base-v2.40.html)
 
-### Sample Code and Scripts
-- [TLS Offload Library Examples](https://github.com/microsoft/AzureManagedHsmTLSOffload)
-- [Azure CLI Scripts](scripts/)
-- [PowerShell Modules](scripts/powershell/)
+## Summary
 
-## Contributing
+Congratulations! You have successfully completed the Azure Application Gateway and Managed HSM Keyless TLS Integration Lab. Throughout this lab, you have:
 
-We welcome contributions to improve this lab! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+1. ✅ Provisioned and configured an Azure Managed HSM with security domain
+2. ✅ Created managed identities and assigned appropriate RBAC roles
+3. ✅ Generated RSA private keys within the HSM for cryptographic operations
+4. ✅ Configured an Ubuntu VM with OpenSSL and the TLS Offload Library
+5. ✅ Generated self-signed certificates using HSM-backed private keys
+6. ✅ Deployed Application Gateway with keyless TLS configuration
+7. ✅ Updated Application Gateway to use HSM-backed certificates via ARM templates
+8. ✅ Enabled diagnostics and monitored keyless TLS operations in real-time
 
-## License
+**Key Takeaways:**
+- Private keys remain secure within FIPS 140-2 Level 3 hardware and are never exported
+- Application Gateway performs TLS termination using cryptographic operations delegated to the HSM
+- All HSM operations are logged and auditable for compliance requirements
+- KeySign operations during TLS handshakes prove the server possesses the private key without exposing it
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For questions and support:
-- Create an issue in this repository
-- Check the [troubleshooting guide](docs/12-troubleshooting.md)
-- Review Azure documentation links above
+This implementation provides enterprise-grade security for TLS termination while maintaining the flexibility and scalability of Azure Application Gateway.
