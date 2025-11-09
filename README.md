@@ -491,6 +491,13 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 > - **SSL Warnings**: Both endpoints will show SSL certificate warnings because they use self-signed certificates - this is expected and safe for testing
 > - **Next Steps**: After confirming both endpoints work, you can proceed to configure keyless TLS using the HSM private key generated in Lab 9
 
+> [!IMPORTANT]
+> **Understanding Current TLS Configuration**
+> 
+> At this stage, the Application Gateway is **NOT** configured with keyless TLS. The `.pfx` certificate file created in section 8.3 contains both the public certificate and the private key. This means the private key is stored locally on the Application Gateway, which is the traditional TLS termination approach. 
+>
+> The following labs will guide you through converting this setup to keyless TLS, where the private key remains securely within the Azure Managed HSM and is never exposed or transmitted to the Application Gateway.
+
 This test environment provides a foundation for implementing keyless TLS where the Application Gateway will use the private key stored in Azure Managed HSM instead of the local self-signed certificate.
 
 ### 9. Configure Keyless TLS on Application Gateway
@@ -627,6 +634,13 @@ az deployment group create --resource-group $RESOURCE_GROUP --template-file ./te
 ![Successful Deployment Verification](assets/images/Updated_AppGW_Success.png)
 
 > **Tip**: To view the Application Gateway JSON configuration in the portal, navigate to your Application Gateway resource, go to the **JSON View** option (usually found in the Overview or Properties section), and look for the `sslCertificates` array to confirm your new certificate name appears.
+
+> [!SUCCESS]
+> **Keyless TLS Now Active!**
+>
+> Congratulations! Your Application Gateway is now configured with **keyless TLS**. Unlike the traditional setup in Lab 8 where the private key was stored locally in the `.pfx` file, the private key now resides securely within the Azure Managed HSM and never leaves the hardware security module. 
+>
+> The Application Gateway performs all TLS cryptographic operations by making secure API calls to the Managed HSM, where the private key executes signing operations (KeySign) without ever being exposed or transmitted. This provides enterprise-grade security while maintaining full TLS termination capabilities.
 
 ### 10. Enable Managed HSM Diagnostics and Monitor Keyless TLS Operations (Optional)
 
