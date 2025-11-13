@@ -99,6 +99,10 @@ export BACKEND_SUBNET_PREFIX="<your-backend-subnet-prefix>"
 export HTTPS_SETTING_NAME="<your-https-setting-name>"
 export PROBE_NAME="<your-probe-name>"
 export APPGW_PIP_NAME="<your-public-ip-name>"
+export LISTENER="<your-https-listener-name>"
+export HTTPS_PORT="<your-frontend-port-name>"
+export MULTISITE_LISTENER_NAME="<your-multisite-listener-name>"
+export MULTISITE_HOSTNAME="<your hostname for mutlisite> e.g. mysite1.com"
 
 # Container Apps configuration - REPLACE WITH YOUR VALUES
 export ACA_ENV="<your-container-apps-env-name>"
@@ -114,8 +118,6 @@ export PRIVATE_KEY="<your-private-key-name>"
 export SSCERT_PASSWD="<your-certificate-password>"
 export SSCERT_NAME="<your-certificate-name>"
 export SSCERT_FILE="<your-certificate-file>"
-export LISTENER="<your-https-listener-name>"
-export HTTPS_PORT="<your-frontend-port-name>"
 ```
 
 > **Important**: Replace all placeholder values (enclosed in `< >`) with your own values. Only the `TOKEN` variable should remain as-is since it dynamically retrieves the access token.
@@ -490,6 +492,17 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 > - **Application Gateway**: Should proxy to the same content through the Application Gateway
 > - **SSL Warnings**: Both endpoints will show SSL certificate warnings because they use self-signed certificates - this is expected and safe for testing
 > - **Next Steps**: After confirming both endpoints work, you can proceed to configure keyless TLS using the HSM private key generated in Lab 9
+
+> **Tip**: If you experience timeout issues when testing the Application Gateway Frontend, your Azure environment may have a Network Security Group (NSG) blocking traffic from your local machine's IP address. To remediate this issue, you can create an NSG rule to allow inbound HTTPS traffic:
+>
+> ```bash
+> # OPTIONAL: If Azure automatically created and associated a NSG to the AppGW VNet, use the following to open up the ports
+> NSG_NAME=$(az network vnet subnet show --resource-group $RESOURCE_GROUP --vnet-name $VNET_NAME --name $APPGW_SUBNET --query networkSecurityGroup.id --output tsv | awk -F '/' '{print $NF}')
+> 
+> # Add an inbound rule to allow HTTPS traffic from any source (0.0.0.0/0)
+> # Note: For production environments, restrict the source to specific IP ranges for better security
+> az network nsg rule create --resource-group $RESOURCE_GROUP --nsg-name $NSG_NAME --name AllowHTTPSInbound --priority 100 --direction Inbound --access Allow --protocol Tcp --source-address-prefix 0.0.0.0/0 --source-port-range "*" --destination-address-prefix "*" --destination-port-range 443
+> ```
 
 > [!CAUTION]
 > **Understanding Current TLS Configuration**
