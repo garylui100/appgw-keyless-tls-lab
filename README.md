@@ -504,6 +504,62 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 > az network nsg rule create --resource-group $RESOURCE_GROUP --nsg-name $NSG_NAME --name AllowHTTPSInbound --priority 100 --direction Inbound --access Allow --protocol Tcp --source-address-prefix 0.0.0.0/0 --source-port-range "*" --destination-address-prefix "*" --destination-port-range 443
 > ```
 
+#### 8.8 Configure Multi-Site Listener (Optional)
+
+Application Gateway supports multi-site listeners, allowing you to route traffic to different backend pools based on the hostname in the HTTP request. This is useful for hosting multiple websites or applications behind a single Application Gateway.
+
+In this optional section, you'll create an additional multi-site listener that routes traffic based on a specific hostname:
+
+```bash
+# Define environment variables for multi-site listener
+export MULTISITE_LISTENER_NAME="multisite-listener"
+export MULTISITE_HOSTNAME="mysite1.com"
+export HTTPS_PORT="httpsPort"
+export SSCERT_NAME=$(az network application-gateway ssl-cert list --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --query "[0].name" --output tsv)
+
+# Create multi-site HTTP listener
+az network application-gateway http-listener create \
+  --resource-group "$RESOURCE_GROUP" \
+  --gateway-name "$APPGW_NAME" \
+  --name "$MULTISITE_LISTENER_NAME" \
+  --frontend-ip "appGatewayFrontendIP" \
+  --frontend-port "$HTTPS_PORT" \
+  --ssl-cert "$SSCERT_NAME" \
+  --host-name "$MULTISITE_HOSTNAME"
+
+# Create routing rule that reuses existing backend pool and settings
+az network application-gateway rule create \
+  --resource-group "$RESOURCE_GROUP" \
+  --gateway-name "$APPGW_NAME" \
+  --name "rule2" \
+  --rule-type Basic \
+  --http-listener "$MULTISITE_LISTENER_NAME" \
+  --address-pool "$BACKEND_POOL" \
+  --http-settings "$HTTPS_SETTING_NAME" \
+  --priority 50
+```
+
+> **Note**: The multi-site listener is configured to route traffic based on the `Host` header in the HTTP request. When a request arrives with the hostname `mysite1.com`, it will be routed according to the `rule2` routing rule to the same backend pool used by the basic listener.
+
+**Test the multi-site listener:**
+
+```bash
+# Get Application Gateway public IP (if not already set)
+if [ -z "$APPGW_PUBLIC_IP" ]; then
+  APPGW_PUBLIC_IP=$(az network public-ip show --resource-group $RESOURCE_GROUP --name $APPGW_PIP_NAME --query ipAddress --output tsv)
+fi
+
+# Test multi-site listener with Host header
+echo "Testing multi-site listener with hostname: $MULTISITE_HOSTNAME"
+curl -vk https://$APPGW_PUBLIC_IP/ -H "Host: $MULTISITE_HOSTNAME"
+```
+
+> **Understanding Multi-Site Listeners**:
+> - **Host Header Routing**: The `-H "Host: mysite1.com"` parameter sends a custom Host header with the request, simulating a DNS request to `mysite1.com`
+> - **Multiple Websites**: In production environments, you would configure DNS records to point different domain names to the Application Gateway's public IP, and the multi-site listener would route each domain to its appropriate backend pool
+> - **SSL Certificates**: Each multi-site listener can use the same SSL certificate (as shown here) or different certificates for different domains
+> - **Rule Priority**: The `--priority 50` parameter ensures this rule is evaluated before the default rule (priority 100)
+
 > [!CAUTION]
 > **Understanding Current TLS Configuration**
 > 
