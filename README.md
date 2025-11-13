@@ -511,32 +511,11 @@ Application Gateway supports multi-site listeners, allowing you to route traffic
 In this optional section, you'll create an additional multi-site listener that routes traffic based on a specific hostname:
 
 ```bash
-# Define environment variables for multi-site listener
-export MULTISITE_LISTENER_NAME="multisite-listener"
-export MULTISITE_HOSTNAME="mysite1.com"
-export HTTPS_PORT="httpsPort"
-export SSCERT_NAME=$(az network application-gateway ssl-cert list --gateway-name $APPGW_NAME --resource-group $RESOURCE_GROUP --query "[0].name" --output tsv)
-
 # Create multi-site HTTP listener
-az network application-gateway http-listener create \
-  --resource-group "$RESOURCE_GROUP" \
-  --gateway-name "$APPGW_NAME" \
-  --name "$MULTISITE_LISTENER_NAME" \
-  --frontend-ip "appGatewayFrontendIP" \
-  --frontend-port "$HTTPS_PORT" \
-  --ssl-cert "$SSCERT_NAME" \
-  --host-name "$MULTISITE_HOSTNAME"
+az network application-gateway http-listener create --resource-group "$RESOURCE_GROUP" --gateway-name "$APPGW_NAME" --name "$MULTISITE_LISTENER_NAME" --frontend-ip "appGatewayFrontendIP" --frontend-port "$HTTPS_PORT" --ssl-cert "$SSCERT_NAME" --host-name "$MULTISITE_HOSTNAME"
 
 # Create routing rule that reuses existing backend pool and settings
-az network application-gateway rule create \
-  --resource-group "$RESOURCE_GROUP" \
-  --gateway-name "$APPGW_NAME" \
-  --name "rule2" \
-  --rule-type Basic \
-  --http-listener "$MULTISITE_LISTENER_NAME" \
-  --address-pool "$BACKEND_POOL" \
-  --http-settings "$HTTPS_SETTING_NAME" \
-  --priority 50
+az network application-gateway rule create --resource-group "$RESOURCE_GROUP" --gateway-name "$APPGW_NAME" --name "rule2" --rule-type Basic --http-listener "$MULTISITE_LISTENER_NAME" --address-pool "$BACKEND_POOL" --http-settings "$HTTPS_SETTING_NAME" --priority 50
 ```
 
 > **Note**: The multi-site listener is configured to route traffic based on the `Host` header in the HTTP request. When a request arrives with the hostname `mysite1.com`, it will be routed according to the `rule2` routing rule to the same backend pool used by the basic listener.
