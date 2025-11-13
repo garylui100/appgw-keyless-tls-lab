@@ -504,7 +504,7 @@ echo "4. Accept the certificate warnings to verify the applications are working"
 > az network nsg rule create --resource-group $RESOURCE_GROUP --nsg-name $NSG_NAME --name AllowHTTPSInbound --priority 100 --direction Inbound --access Allow --protocol Tcp --source-address-prefix 0.0.0.0/0 --source-port-range "*" --destination-address-prefix "*" --destination-port-range 443
 > ```
 
-#### 8.8 Configure Multi-Site Listener (Optional)
+#### 8.8 Configure Multi-Site Listener
 
 Application Gateway supports multi-site listeners, allowing you to route traffic to different backend pools based on the hostname in the HTTP request. This is useful for hosting multiple websites or applications behind a single Application Gateway.
 
@@ -523,11 +523,6 @@ az network application-gateway rule create --resource-group "$RESOURCE_GROUP" --
 **Test the multi-site listener:**
 
 ```bash
-# Get Application Gateway public IP (if not already set)
-if [ -z "$APPGW_PUBLIC_IP" ]; then
-  APPGW_PUBLIC_IP=$(az network public-ip show --resource-group $RESOURCE_GROUP --name $APPGW_PIP_NAME --query ipAddress --output tsv)
-fi
-
 # Test multi-site listener with Host header
 echo "Testing multi-site listener with hostname: $MULTISITE_HOSTNAME"
 curl -vk https://$APPGW_PUBLIC_IP/ -H "Host: $MULTISITE_HOSTNAME"
