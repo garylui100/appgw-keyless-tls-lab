@@ -18,7 +18,7 @@ The solution integrates the following Azure services:
 
 - **Azure Application Gateway**: Provides TLS termination and load balancing
 - **Azure Managed HSM**: Stores private keys and performs cryptographic operations
-- **Linux VM/Container**: Hosts OpenSSL and e_akv.so library for certificate operations and HSM integration
+- **Linux VM/Container**: Hosts OpenSSL and appgw_ekv.so library for certificate operations and HSM integration
 
 ### High-Level Architecture Diagram
 
@@ -37,7 +37,7 @@ The architecture demonstrates the flow of keyless TLS operations:
 
 - **Azure Application Gateway**: Layer-7 load balancer with TLS termination capabilities and integrated TLS Offload Library (PKCS#11) for keyless TLS operations
 - **Azure Managed HSM**: FIPS 140-2 Level 3 validated hardware security module for private key storage and cryptographic operations
-- **Linux VM**: Virtual machine hosting certificate generation tools, OpenSSL, and e_akv.so library with PKCS#11 interface for HSM integration
+- **Linux VM**: Virtual machine hosting certificate generation tools, OpenSSL, and appgw_ekv.so library with PKCS#11 interface for HSM integration
 - **Backend Servers**: Target applications including web applications, Azure Container Apps, and microservices that receive re-encrypted TLS traffic
 
 ## Prerequisites
@@ -56,7 +56,7 @@ Before starting this lab, ensure you have:
 ### Software Requirements
 - Azure CLI or Azure PowerShell
 - OpenSSL-3.0.13 for certificate operations
-- Azure Managed HSM TLS Offload Library (e_akv.so)
+- Azure Managed HSM TLS Offload Library (appgw_ekv.so)
 
 ## Lab Sections
 
@@ -211,23 +211,21 @@ export smioid="<System Managed Identity Object ID>"
 # Assign "Managed HSM Crypto User" role to the VM's system managed identity for Ubuntu VM's key operations
 az keyvault role assignment create --hsm-name $MHSM_NAME --role "Managed HSM Crypto User" --assignee-object-id $smioid --assignee-principal-type MSI --scope /keys
 ```
-### 6. Copy e_akv.so Library to the Ubuntu VM
+### 6. Copy appgw_ekv.so Library to the Ubuntu VM
 
 Download and transfer the Azure Managed HSM TLS Offload Library to your Ubuntu VM:
 
 #### 6.1 Download the TLS Offload Library
 
-Download the [`e_akv.so`](libs/e_akv.so) library from the repository to your local machine:
-- Click the link above to view the file, then click "Download" or "Raw" to save it locally
-- Alternative: Right-click the link and select "Save link as..." to download directly
+Download the [`appgw_ekv.so`](https://github.com/microsoft/AzureManagedHsmTLSOffload/releases/download/v1.1.0.03455/appgw_ekv.so) library from the official Azure Managed HSM TLS Offload release to your local machine.
 
 #### 6.2 Transfer the Library to Ubuntu VM
 
-Transfer the `e_akv.so` library to your Ubuntu VM's home directory:
+Transfer the `appgw_ekv.so` library to your Ubuntu VM's home directory:
    
    **Option A: Using SCP (if connecting from Linux/macOS/Windows with WSL):**
    ```bash
-   scp e_akv.so <username>@<vm-public-ip>:/home/<username>/
+    scp appgw_ekv.so <username>@<vm-public-ip>:/home/<username>/
    ```
    
    **Option B: Using Azure portal file upload:**
@@ -239,9 +237,10 @@ Transfer the `e_akv.so` library to your Ubuntu VM's home directory:
    ```bash
    # SSH into your Ubuntu VM first, then run:
    cd /home/<username>
-   wget <library-download-url>
+    wget https://github.com/microsoft/AzureManagedHsmTLSOffload/releases/download/v1.1.0.03455/appgw_ekv.so
    ```
-   > **Note**: Replace `<library-download-url>` with the official library download URL when available. For lab purposes, you can use the GitHub raw URL as an example: `https://github.com/luzhi_microsoft/appgw-mhsm-tls-integration-lab/raw/main/libs/e_akv.so`
+
+    > **Note**: This URL downloads version `v1.1.0.03455` directly from the official Microsoft release.
 
 Replace `<username>` with your actual Ubuntu username and `<vm-public-ip>` with your VM's public IP address.
 
@@ -251,14 +250,14 @@ Configure the Ubuntu VM with the required dependencies, OpenSSL 3.0.13, and the 
 
 #### 7.1 SSH to Ubuntu VM and Configure the Environment
 
-SSH to your Ubuntu VM and navigate to the home directory where you transferred the `e_akv.so` library:
+SSH to your Ubuntu VM and navigate to the home directory where you transferred the `appgw_ekv.so` library:
 
 ```bash
 # SSH into your Ubuntu VM and navigate to the user directory
 cd /home/<username>
 
 # Set proper permissions for the TLS Offload Library
-chmod 755 /home/azureuser/e_akv.so
+chmod 755 /home/azureuser/appgw_ekv.so
 
 # Update system packages
 sudo apt update && sudo apt upgrade -y
@@ -304,13 +303,10 @@ Install and configure the Azure Managed HSM TLS Offload Library:
 
 ```bash
 # Copy the engine binary to OpenSSL engine directory
-sudo cp /home/azureuser/e_akv.so /opt/openssl-3.0.13/lib64/engines-3/
+sudo cp /home/azureuser/appgw_ekv.so /opt/openssl-3.0.13/lib64/engines-3/
 
-# Verify the hash of the e_akv.so file
-md5sum /opt/openssl-3.0.13/lib64/engines-3/e_akv.so
-
-# Expected output:
-# de1f6553e5da8c3a6a3456c037fa7d1d  /opt/openssl-3.0.13/lib64/engines-3/e_akv.so
+# Record the SHA-256 hash for integrity verification
+sha256sum /opt/openssl-3.0.13/lib64/engines-3/appgw_ekv.so
 ```
 
 #### 7.4 Configure Environment Variables
@@ -323,7 +319,7 @@ export LD_LIBRARY_PATH=/opt/openssl-3.0.13/lib64:$LD_LIBRARY_PATH
 export OPENSSL_ENGINES=/opt/openssl-3.0.13/lib64/engines-3
 export PATH=/opt/openssl-3.0.13/bin:$PATH
 
-# Test the e_akv.so engine is working properly
+# Test the appgw_ekv.so engine is working properly
 openssl engine -t -c -vvvv e_akv
 
 # Expected output:
@@ -564,7 +560,69 @@ az network application-gateway show --name $APPGW_NAME --resource-group $RESOURC
 
 The output should show the user-assigned managed identity associated with your Application Gateway.
 
-#### 9.2 Export Application Gateway ARM Template
+Choose either **9.2A (Azure CLI)** or **9.2B (ARM template)** to configure keyless TLS on the Application Gateway listener. Do not perform both methods.
+
+<details>
+<summary><strong>9.2A Configure Keyless TLS from CLI</strong></summary>
+
+The managed identity and its Application Gateway association were configured in earlier sections. Continue by adding the HSM-backed certificate reference and updating the existing HTTPS listener.
+
+Set values for the new HSM-backed certificate. These commands reuse the Managed HSM, private key, certificate, and listener variables created earlier in the lab:
+
+```bash
+# Use a new certificate name so Application Gateway recognizes the HSM-backed certificate
+export MHSM_CERT_NAME="${SSCERT_NAME}-mhsm"
+
+# Build the Managed HSM key URI and read the public certificate generated in Lab 7.5
+export HSM_KEY_ID="https://${MHSM_NAME}.managedhsm.azure.net/keys/${PRIVATE_KEY}"
+export PUBLIC_CERT_DATA="$(tr -d '\r\n' < base64.txt)"
+```
+
+Add a new reference to the managed HSM in `sslCertificates`:
+
+```bash
+az network application-gateway ssl-cert create \
+    --resource-group "$RESOURCE_GROUP" \
+    --gateway-name "$APPGW_NAME" \
+    --name "$MHSM_CERT_NAME" \
+    --hsm keyId="$HSM_KEY_ID" publicCertData="$PUBLIC_CERT_DATA"
+```
+
+Update the existing HTTPS listener to use the HSM-backed certificate. To configure the multi-site listener instead, replace `$LISTENER` with `$MULTISITE_LISTENER_NAME`.
+
+```bash
+az network application-gateway http-listener update \
+    --resource-group "$RESOURCE_GROUP" \
+    --gateway-name "$APPGW_NAME" \
+    --name "$LISTENER" \
+    --ssl-cert "$MHSM_CERT_NAME"
+```
+
+Verify that the new certificate references the Managed HSM key and that the listener references the new certificate:
+
+```bash
+az network application-gateway show \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$APPGW_NAME" \
+    --query "sslCertificates[?name=='$MHSM_CERT_NAME'].{name:name,keyId:hsm.keyId}" \
+    --output table
+
+az network application-gateway http-listener show \
+    --resource-group "$RESOURCE_GROUP" \
+    --gateway-name "$APPGW_NAME" \
+    --name "$LISTENER" \
+    --query "{name:name,sslCertificate:sslCertificate.id}" \
+    --output json
+```
+
+The certificate output should show a key URI under your Managed HSM, and the listener output should end with `/sslCertificates/$MHSM_CERT_NAME`.
+
+> **Source**: Adapted for this lab from [Configure keyless TLS termination with Azure Key Vault Managed HSM](https://learn.microsoft.com/azure/application-gateway/keyless-tls#configure-keyless-tls).
+
+</details>
+
+<details>
+<summary><strong>9.2B Configure Keyless TLS from ARM Template</strong></summary>
 
 Export the Application Gateway configuration template for keyless TLS configuration:
 
@@ -576,8 +634,6 @@ Export the Application Gateway configuration template for keyless TLS configurat
 ![Download ARM Template](assets/images/Download%20Template.png)
 
 > **Note**: The exported template will be used to configure keyless TLS parameters. Save the template file to a location where you can easily access and modify it.
-
-#### 9.3 Configure Keyless TLS in ARM Template
 
 After downloading the ARM template, you'll need to modify it to enable keyless TLS:
 
@@ -646,8 +702,6 @@ After downloading the ARM template, you'll need to modify it to enable keyless T
 
 > **Important**: Ensure the `sslCertificate.id` references the certificate name you configured in the `sslCertificates` section (e.g., `mHSM-Key001`). The listener configuration establishes the connection between your HTTPS endpoint and the HSM-backed certificate.
 
-#### 9.4 Redeploy Application Gateway with Updated ARM Template
-
 After modifying the ARM template to enable keyless TLS, redeploy the Application Gateway configuration:
 
 - **Upload template files to Azure Cloud Shell**: Transfer the modified `template.json` and `parameters.json` files to Azure Cloud Shell using one of the following methods:
@@ -677,6 +731,8 @@ az deployment group create --resource-group $RESOURCE_GROUP --template-file ./te
 ![Successful Deployment Verification](assets/images/Updated_AppGW_Success.png)
 
 > **Tip**: To view the Application Gateway JSON configuration in the portal, navigate to your Application Gateway resource, go to the **JSON View** option (usually found in the Overview or Properties section), and look for the `sslCertificates` array to confirm your new certificate name appears.
+
+</details>
 
 > [!NOTE]
 > **Keyless TLS Now Active!**
